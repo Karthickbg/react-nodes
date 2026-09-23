@@ -11,7 +11,7 @@ npm install react-nodes
 ## Usage
 
 ```tsx
-import { Tree } from "react-nodes";
+import { TreeCanvas } from "react-nodes";
 
 const data = [
   {
