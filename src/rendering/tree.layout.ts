@@ -1,5 +1,5 @@
 import { TreeNode } from "../types";
-import { LayoutOptions, NodeLayout } from "../types/canvas.internal.types";
+import { LayoutOptions, NodeLayout } from "../types/tree.internal.types";
 
 export function calculateTreeLayout(
     data: TreeNode[],

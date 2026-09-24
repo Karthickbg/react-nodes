@@ -1,4 +1,4 @@
-import { TreeNode } from "./canvas.types";
+import { TreeNode } from "./tree.types";
 
 export interface NodeLayout {
     node: TreeNode;
@@ -15,7 +15,7 @@ export interface Viewport {
     zoom: number;
 }
 
-export interface DrawTreeArgs {
+export interface RenderTreeArgs {
     ctx: CanvasRenderingContext2D;
 
     data: TreeNode[];

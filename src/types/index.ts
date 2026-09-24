@@ -1,1 +1,1 @@
-export type { TreeNode, CanvasProps } from "./canvas.types";
+export type { TreeNode, TreeCanvasProps } from "./tree.types";

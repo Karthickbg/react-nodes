@@ -1,11 +1,11 @@
-import { DrawTreeArgs } from "../types/canvas.internal.types";
-import { drawEdges } from "./tree-canvas.edges";
-import { calculateTreeLayout } from "./tree-canvas.layout";
-import { drawNode } from "./tree-canvas.node";
+import { RenderTreeArgs } from "../types/tree.internal.types";
+import { drawEdges } from "./tree.edges";
+import { calculateTreeLayout } from "./tree.layout";
+import { drawNode } from "./tree.node";
 
 
 
-export function drawTree({
+export function renderTree({
     ctx,
     data,
     viewport,
@@ -15,7 +15,7 @@ export function drawTree({
     nodeHeight,
     edgeGap,
     nodeGap,
-}: DrawTreeArgs) {
+}: RenderTreeArgs) {
     // Clear canvas
     ctx.clearRect(
         0,

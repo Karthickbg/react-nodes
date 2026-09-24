@@ -92,9 +92,9 @@ npm run build-storybook
 react-nodes/
 ├── src/
 │   ├── components/
-│   ├── layout/
+│   │   └── TreeCanvas/
 │   ├── rendering/
-│   ├── hooks/
+│   ├── types/
 │   └── index.ts
 ├── package.json
 ├── tsconfig.json
@@ -107,7 +107,7 @@ react-nodes/
 `react-nodes` is written in TypeScript and includes TypeScript declarations with the npm package.
 
 ```tsx
-import type { TreeNode, TreeProps } from "react-nodes";
+import type { TreeNode, TreeCanvasProps } from "react-nodes";
 ```
 
 ## Building

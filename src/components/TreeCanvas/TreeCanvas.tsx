@@ -1,17 +1,17 @@
 import { useCallback, useEffect, useRef } from "react";
-import { CanvasProps } from "../../types/canvas.types";
-import { DrawTreeArgs, Viewport } from "../../types/canvas.internal.types";
-import { drawTree } from "../../Renderer/tree-canvas.lib";
+import { TreeCanvasProps } from "../../types/tree.types";
+import { RenderTreeArgs, Viewport } from "../../types/tree.internal.types";
+import { renderTree } from "../../rendering/tree.renderer";
 
-export function TreeCanvas(props: CanvasProps) {
+export function TreeCanvas(props: TreeCanvasProps) {
   const {
     width = "100%",
     height = "100%",
     data,
-    nodeWidth = 100,
+    nodeWidth = 150,
     nodeHeight = 50,
-    edgeGap = 20,
-    nodeGap = 20,
+    edgeGap = 150,
+    nodeGap = 30,
   } = props;
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const viewportRef = useRef<Viewport>({
@@ -69,7 +69,7 @@ export function TreeCanvas(props: CanvasProps) {
 
     if (!ctx) return;
 
-    const args: DrawTreeArgs = {
+    const args: RenderTreeArgs = {
       ctx,
       data,
 
@@ -85,7 +85,7 @@ export function TreeCanvas(props: CanvasProps) {
       height: canvas.clientHeight,
     };
 
-    drawTree(args);
+    renderTree(args);
   }, [
     data,
     nodeWidth,

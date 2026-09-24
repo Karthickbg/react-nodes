@@ -1,2 +1,2 @@
-export { TreeCanvas } from "./components/TreeCanvas";;
-export type { TreeNode, CanvasProps } from "./types";
+export { TreeCanvas } from "./components/TreeCanvas";
+export type { TreeNode, TreeCanvasProps } from "./types";

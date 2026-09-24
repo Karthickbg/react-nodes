@@ -1,7 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
-import { TreeCanvas } from "../../src/components/TreeCanvas";
-import { TreeNode } from "../../src/types";
+import { TreeCanvas, type TreeNode } from "../../src";
 
 const data: TreeNode[] = [
     {

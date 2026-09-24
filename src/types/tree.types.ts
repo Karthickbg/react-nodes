@@ -7,7 +7,7 @@ export interface TreeNode {
     value: string;
 }
 
-export interface CanvasProps {
+export interface TreeCanvasProps {
   data: TreeNode[];
   renderNode?: (node: TreeNode) => ReactNode;
   width?: string;

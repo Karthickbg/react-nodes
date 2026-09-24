@@ -1,4 +1,4 @@
-import { NodeLayout } from "../types/canvas.internal.types";
+import { NodeLayout } from "../types/tree.internal.types";
 
 export const drawNode = (
     ctx: CanvasRenderingContext2D,
