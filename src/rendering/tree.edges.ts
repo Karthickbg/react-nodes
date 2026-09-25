@@ -59,6 +59,8 @@ export const drawEdges = (
             endY
         );
 
+        ctx.setLineDash([layout.node.lineType === "dashed" ? 5 : 0]);
+        
         ctx.stroke();
     }
 };

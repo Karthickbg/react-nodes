@@ -2,6 +2,9 @@
 
 A React library for building interactive node-based hierarchies and tree visualizations.
 
+## Basic UI Screenshot
+![output](image.png)
+
 ## Installation
 
 ```bash

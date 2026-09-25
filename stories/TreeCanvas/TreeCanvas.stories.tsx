@@ -20,6 +20,7 @@ const data: TreeNode[] = [
         parentId: "ceo",
         title: "CFO",
         value: "Michael Brown",
+        lineType: "dashed",
     },
     {
         id: "coo",
@@ -130,20 +131,3 @@ type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {};
 
-export const CustomNodes: Story = {
-  args: {
-    renderNode: (node) => (
-      <span
-        style={{
-          background: "#e5f3ee",
-          border: "1px solid #a6d6c2",
-          borderRadius: 6,
-          display: "inline-block",
-          padding: "6px 10px",
-        }}
-      >
-        {node.title}
-      </span>
-    ),
-  },
-};
