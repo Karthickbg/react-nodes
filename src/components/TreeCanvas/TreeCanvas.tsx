@@ -1,7 +1,10 @@
+'use client'
+
 import { useCallback, useEffect, useRef } from "react";
 import { TreeCanvasProps } from "../../types/tree.types";
-import { RenderTreeArgs, Viewport } from "../../types/tree.internal.types";
+import { NodeLayout, RenderTreeArgs, Viewport } from "../../types/tree.internal.types";
 import { renderTree } from "../../rendering/tree.renderer";
+import { getNodeAtPoint } from "../../utils/tree.hit-test";
 
 export function TreeCanvas(props: TreeCanvasProps) {
   const {
@@ -12,7 +15,11 @@ export function TreeCanvas(props: TreeCanvasProps) {
     nodeHeight = 50,
     edgeGap = 150,
     nodeGap = 30,
+    onNodeClick,
+    onHoverNode,
   } = props;
+  const hoveredNodeRef = useRef<string | null>(null);
+  const layoutsRef = useRef<NodeLayout[]>([]);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const viewportRef = useRef<Viewport>({
     x: 0,
@@ -85,7 +92,8 @@ export function TreeCanvas(props: TreeCanvasProps) {
       height: canvas.clientHeight,
     };
 
-    renderTree(args);
+     const layouts = renderTree(args);
+     layoutsRef.current = layouts;
   }, [
     data,
     nodeWidth,
@@ -191,11 +199,52 @@ export function TreeCanvas(props: TreeCanvasProps) {
   const handleClick = (event: React.MouseEvent<HTMLCanvasElement>) => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-    const rect = (canvas as HTMLCanvasElement).getBoundingClientRect();
-    const x = event.clientX - rect.left;
-    const y = event.clientY - rect.top;
-    // alert(`Clicked at: (${x}, ${y})`);
+
+    const node = getNodeAtPoint(
+        layoutsRef.current,
+        event,
+        canvas,
+        viewportRef.current
+    );
+
+    if (node) {
+        console.log("Clicked node:", node.node.id);
+        onNodeClick?.(node.node);
+    }
   }
+
+const handleMouseMove = (event: React.MouseEvent<HTMLCanvasElement>) => {
+  const canvas = canvasRef.current;
+
+  if (!canvas) {
+    return;
+  }
+
+  const node = getNodeAtPoint(
+        layoutsRef.current,
+        event,
+        canvas,
+        viewportRef.current
+  );
+
+   if (node) {
+    const nodeId = node.node.id ?? null;
+
+    // Don't call onHover repeatedly for the same node
+    if (hoveredNodeRef.current === nodeId) {
+      return;
+    }
+
+    hoveredNodeRef.current = nodeId;
+    console.log("Hovered node:", node.node.id);
+    onHoverNode?.(node.node);
+  } else {
+    if (hoveredNodeRef.current !== null) {
+      hoveredNodeRef.current = null;
+      onHoverNode?.(null);
+    }
+  }
+};
 
   return (
     <canvas
@@ -207,6 +256,7 @@ export function TreeCanvas(props: TreeCanvasProps) {
       onPointerDown={handlePointerDown}
       onPointerMove={handlePointerMove}
       onPointerUp={handlePointerUp}
+      onMouseMove={handleMouseMove}
     />
   )
 }

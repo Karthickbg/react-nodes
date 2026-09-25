@@ -5,6 +5,9 @@ export interface TreeNode {
     parentId?: string;
     title: string;
     value: string;
+    width?: number;
+    height?: number;
+    type?: string;
 }
 
 export interface TreeCanvasProps {
@@ -21,5 +24,5 @@ export interface TreeCanvasProps {
   orientation?: "left" | "right" | "top" | "bottom";
 
   onNodeClick?: (node: TreeNode) => void;
-  onHoverNode?: (node: TreeNode) => void;
+  onHoverNode?: (node: TreeNode | null) => void;
 }

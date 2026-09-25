@@ -1,6 +1,6 @@
 import { RenderTreeArgs } from "../types/tree.internal.types";
 import { drawEdges } from "./tree.edges";
-import { calculateTreeLayout } from "./tree.layout";
+import { calculateTreeLayout } from "../utils/tree.layout";
 import { drawNode } from "./tree.node";
 
 
@@ -64,4 +64,5 @@ export function renderTree({
     }
 
     ctx.restore();
+    return layouts;
 }

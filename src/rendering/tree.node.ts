@@ -34,21 +34,21 @@ export const drawNode = (
 
     // Title
     ctx.fillStyle = "#666666";
-    ctx.font = "16px sans-serif";
+    ctx.font = "12px sans-serif";
 
     ctx.fillText(
         node.title,
-        x + 20,
-        y + 30
+        x + 10,
+        y + 20
     );
 
     // Value
     ctx.fillStyle = "#111111";
-    ctx.font = "bold 28px sans-serif";
+    ctx.font = "bold 18px sans-serif";
 
     ctx.fillText(
         node.value,
-        x + 20,
-        y + 70
+        x + 10,
+        y + 40
     );
 };
