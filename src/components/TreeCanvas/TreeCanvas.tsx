@@ -4,7 +4,7 @@ import { forwardRef, useCallback, useEffect, useImperativeHandle, useRef } from 
 import { TreeCanvasHandle, TreeCanvasProps } from "../../types/tree.types";
 import { NodeLayout, RenderTreeArgs, Viewport } from "../../types/tree.internal.types";
 import { renderTree } from "../../rendering/tree.renderer";
-import { getNodeAtPoint } from "../../utils/tree.hit-test";
+import { getNodeAtPoint, getWorldPoint } from "../../utils/tree.canvas-interaction";
 
 export const TreeCanvas = forwardRef<
   TreeCanvasHandle,
@@ -51,8 +51,10 @@ export const TreeCanvas = forwardRef<
 
     const handleWheel = (event: WheelEvent) => {
       event.preventDefault();
-      if(!zoomEnabled) return;
+      if (!zoomEnabled) return;
+
       const viewport = viewportRef.current;
+      const { screenX, screenY, x, y } = getWorldPoint(event as unknown as React.MouseEvent<HTMLCanvasElement>, canvas, viewport);
 
       const zoomFactor =
         event.deltaY > 0 ? 0.9 : 1.1;
@@ -63,6 +65,13 @@ export const TreeCanvas = forwardRef<
         minZoom,
         Math.min(viewport.zoom, maxZoom)
       );
+
+      // to center the zoom on the mouse position, we need to adjust the viewport's x and y
+      viewport.x =
+        screenX - x * viewport.zoom;
+
+      viewport.y =
+        screenY - y * viewport.zoom;
 
       render();
     };
@@ -102,8 +111,8 @@ export const TreeCanvas = forwardRef<
       height: canvas.clientHeight,
     };
 
-     const layouts = renderTree(args);
-     layoutsRef.current = layouts;
+    const layouts = renderTree(args);
+    layoutsRef.current = layouts;
   }, [
     data,
     nodeWidth,
@@ -161,7 +170,7 @@ export const TreeCanvas = forwardRef<
   const handlePointerDown = (
     event: React.PointerEvent<HTMLCanvasElement>
   ) => {
-    if(!panEnabled) return;
+    if (!panEnabled) return;
     isDraggingRef.current = true;
 
     dragStartRef.current = {
@@ -213,18 +222,18 @@ export const TreeCanvas = forwardRef<
     if (!canvas) return;
 
     const node = getNodeAtPoint(
-        layoutsRef.current,
-        event,
-        canvas,
-        viewportRef.current
+      layoutsRef.current,
+      event,
+      canvas,
+      viewportRef.current
     );
 
     if (node) {
       clickTimeout.current = setTimeout(() => {
-          console.log("Clicked node:", node.node.id);
-          onNodeClick?.(node.node, event);
-          clickTimeout.current = null; // Reset after execution
-        }, 250);
+        console.log("Clicked node:", node.node.id);
+        onNodeClick?.(node.node, event);
+        clickTimeout.current = null; // Reset after execution
+      }, 250);
     }
   }
 
@@ -237,50 +246,50 @@ export const TreeCanvas = forwardRef<
     if (!canvas) return;
 
     const node = getNodeAtPoint(
-        layoutsRef.current,
-        event,
-        canvas,
-        viewportRef.current
+      layoutsRef.current,
+      event,
+      canvas,
+      viewportRef.current
     );
 
     if (node) {
-        console.log("Double-clicked node:", node.node.id);
-        onDoubleClickNode?.(node.node, event);
+      console.log("Double-clicked node:", node.node.id);
+      onDoubleClickNode?.(node.node, event);
     }
   }
 
-const handleMouseMove = (event: React.MouseEvent<HTMLCanvasElement>) => {
-  const canvas = canvasRef.current;
+  const handleMouseMove = (event: React.MouseEvent<HTMLCanvasElement>) => {
+    const canvas = canvasRef.current;
 
-  if (!canvas) {
-    return;
-  }
-
-  const node = getNodeAtPoint(
-        layoutsRef.current,
-        event,
-        canvas,
-        viewportRef.current
-  );
-
-   if (node) {
-    const nodeId = node.node.id ?? null;
-
-    // Don't call onHover repeatedly for the same node
-    if (hoveredNodeRef.current === nodeId) {
+    if (!canvas) {
       return;
     }
 
-    hoveredNodeRef.current = nodeId;
-    console.log("Hovered node:", node.node.id);
-    onHoverNode?.(node.node, event);
-  } else {
-    if (hoveredNodeRef.current !== null) {
-      hoveredNodeRef.current = null;
-      onHoverNode?.(null, event);
+    const node = getNodeAtPoint(
+      layoutsRef.current,
+      event,
+      canvas,
+      viewportRef.current
+    );
+
+    if (node) {
+      const nodeId = node.node.id ?? null;
+
+      // Don't call onHover repeatedly for the same node
+      if (hoveredNodeRef.current === nodeId) {
+        return;
+      }
+
+      hoveredNodeRef.current = nodeId;
+      console.log("Hovered node:", node.node.id);
+      onHoverNode?.(node.node, event);
+    } else {
+      if (hoveredNodeRef.current !== null) {
+        hoveredNodeRef.current = null;
+        onHoverNode?.(null, event);
+      }
     }
-  }
-};
+  };
 
   const setZoom = useCallback(
     (zoom: number) => {
@@ -318,10 +327,10 @@ const handleMouseMove = (event: React.MouseEvent<HTMLCanvasElement>) => {
       render();
     },
     [render]
-  );  
+  );
 
 
-useImperativeHandle(
+  useImperativeHandle(
     ref,
     () => ({
       zoomTo(zoom: number) {
@@ -378,7 +387,7 @@ useImperativeHandle(
       onClick={handleClick}
       id="tree-canvas"
       className="tree-canvas"
-      style={{ width: width, height: height, display: "block", overscrollBehavior: "contain" }}
+      style={{ width: width, height: height, display: "block", overscrollBehavior: "contain", touchAction: "none" }}
       onPointerDown={handlePointerDown}
       onPointerMove={handlePointerMove}
       onPointerUp={handlePointerUp}
