@@ -30,6 +30,7 @@ export interface RenderTreeArgs {
 
     edgeGap: number;
     nodeGap: number;
+    edgeType: "bezier" | "polyline";
 }
 
 

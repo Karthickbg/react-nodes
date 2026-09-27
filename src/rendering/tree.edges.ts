@@ -2,7 +2,8 @@ import { NodeLayout } from "../types/tree.internal.types";
 
 export const drawEdges = (
     ctx: CanvasRenderingContext2D,
-    layouts: NodeLayout[]
+    layouts: NodeLayout[],
+    edgeType: "bezier" | "polyline" | "straight"
 ) => {
     const layoutMap = new Map(
         layouts.map(layout => [
@@ -46,20 +47,38 @@ export const drawEdges = (
         ctx.save();    
 
         ctx.beginPath();
-
         ctx.moveTo(
             startX,
             startY
         );
+        
+        if(edgeType === "polyline") {
 
-        ctx.bezierCurveTo(
-            middleX,
-            startY,
-            middleX,
-            endY,
-            endX,
-            endY
-        );
+            ctx.lineTo(
+                middleX,
+                startY
+            );
+
+            ctx.lineTo(
+                middleX,
+                endY
+            );
+
+            ctx.lineTo(
+                endX,
+                endY
+            );
+        } else {
+
+            ctx.bezierCurveTo(
+                middleX,
+                startY,
+                middleX,
+                endY,
+                endX,
+                endY
+            );
+        }
 
         
 

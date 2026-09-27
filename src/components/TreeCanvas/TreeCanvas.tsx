@@ -18,6 +18,7 @@ export const TreeCanvas = forwardRef<
     nodeHeight = 50,
     edgeGap = 150,
     nodeGap = 30,
+    edgeType = "bezier",
     minZoom = 0.2,
     maxZoom = 3,
     initialZoom = 1,
@@ -54,7 +55,44 @@ export const TreeCanvas = forwardRef<
     worldY: number;
   } | null>(null);
 
-  useEffect(() => {
+
+  const render = useCallback(() => {
+    const canvas = canvasRef.current;
+
+    if (!canvas) return;
+
+    const ctx = canvas.getContext("2d");
+
+    if (!ctx) return;
+
+    const args: RenderTreeArgs = {
+      ctx,
+      data,
+
+      viewport: viewportRef.current,
+
+      nodeWidth,
+      nodeHeight,
+
+      edgeGap,
+      nodeGap,
+      edgeType,
+      width: canvas.clientWidth,
+      height: canvas.clientHeight,
+    };
+
+    const layouts = renderTree(args);
+    layoutsRef.current = layouts;
+  }, [
+    data,
+    nodeWidth,
+    nodeHeight,
+    edgeGap,
+    nodeGap,
+    edgeType,
+  ]);
+
+    useEffect(() => {
     const canvas = canvasRef.current;
 
     if (!canvas) return;
@@ -93,43 +131,7 @@ export const TreeCanvas = forwardRef<
     return () => {
       canvas.removeEventListener("wheel", handleWheel);
     };
-  }, [zoomEnabled, minZoom, maxZoom]);
-
-
-  const render = useCallback(() => {
-    const canvas = canvasRef.current;
-
-    if (!canvas) return;
-
-    const ctx = canvas.getContext("2d");
-
-    if (!ctx) return;
-
-    const args: RenderTreeArgs = {
-      ctx,
-      data,
-
-      viewport: viewportRef.current,
-
-      nodeWidth,
-      nodeHeight,
-
-      edgeGap,
-      nodeGap,
-
-      width: canvas.clientWidth,
-      height: canvas.clientHeight,
-    };
-
-    const layouts = renderTree(args);
-    layoutsRef.current = layouts;
-  }, [
-    data,
-    nodeWidth,
-    nodeHeight,
-    edgeGap,
-    nodeGap,
-  ]);
+  }, [zoomEnabled, minZoom, maxZoom, render]);
 
   useEffect(() => {
     const canvas = canvasRef.current;

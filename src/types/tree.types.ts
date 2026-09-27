@@ -27,6 +27,7 @@ export interface TreeCanvasProps {
   
   edgeGap?: number;
   nodeGap?: number;
+  edgeType?: "bezier" | "polyline";
 
   minZoom?: number;
   maxZoom?: number;

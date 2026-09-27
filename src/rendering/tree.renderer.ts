@@ -15,6 +15,7 @@ export function renderTree({
     nodeHeight,
     edgeGap,
     nodeGap,
+    edgeType,
 }: RenderTreeArgs) {
     // Clear canvas
     ctx.clearRect(
@@ -52,7 +53,8 @@ export function renderTree({
     // Draw connections
     drawEdges(
         ctx,
-        layouts
+        layouts,
+        edgeType,
     );
     
 
