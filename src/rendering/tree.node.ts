@@ -12,6 +12,8 @@ export const drawNode = (
         height,
     } = layout;
 
+    ctx.save();
+
     // Card background
     ctx.fillStyle = "#ffffff";
     ctx.fillRect(
@@ -51,4 +53,6 @@ export const drawNode = (
         x + 10,
         y + 40
     );
+
+    ctx.restore();
 };

@@ -54,6 +54,7 @@ export function renderTree({
         ctx,
         layouts
     );
+    
 
     // Draw nodes
     for (const layout of layouts) {
@@ -64,5 +65,6 @@ export function renderTree({
     }
 
     ctx.restore();
+    
     return layouts;
 }

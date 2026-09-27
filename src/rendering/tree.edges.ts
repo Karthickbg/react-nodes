@@ -43,6 +43,8 @@ export const drawEdges = (
         const middleX =
             (startX + endX) / 2;
 
+        ctx.save();    
+
         ctx.beginPath();
 
         ctx.moveTo(
@@ -59,8 +61,11 @@ export const drawEdges = (
             endY
         );
 
+        
+
         ctx.setLineDash([layout.node.lineType === "dashed" ? 5 : 0]);
         
         ctx.stroke();
+        ctx.restore();
     }
 };

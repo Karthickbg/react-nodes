@@ -4,7 +4,7 @@ import { forwardRef, useCallback, useEffect, useImperativeHandle, useRef } from 
 import { TreeCanvasHandle, TreeCanvasProps } from "../../types/tree.types";
 import { NodeLayout, RenderTreeArgs, Viewport } from "../../types/tree.internal.types";
 import { renderTree } from "../../rendering/tree.renderer";
-import { getNodeAtPoint, getWorldPoint } from "../../utils/tree.canvas-interaction";
+import { getNodeAtPoint, getPointerPosition, getWorldPoint } from "../../utils/tree.canvas-interaction";
 
 export const TreeCanvas = forwardRef<
   TreeCanvasHandle,
@@ -43,6 +43,16 @@ export const TreeCanvas = forwardRef<
     x: 0,
     y: 0,
   });
+  const pointersRef = useRef(
+    new Map<number, { x: number; y: number }>()
+  );
+
+  const pinchRef = useRef<{
+    startDistance: number;
+    startZoom: number;
+    worldX: number;
+    worldY: number;
+  } | null>(null);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -170,50 +180,139 @@ export const TreeCanvas = forwardRef<
   const handlePointerDown = (
     event: React.PointerEvent<HTMLCanvasElement>
   ) => {
-    if (!panEnabled) return;
+    const canvas = canvasRef.current;
+    if (!panEnabled || !canvas) return;
     isDraggingRef.current = true;
+
+    const { screenX: x, screenY: y } = getPointerPosition(event, canvas);
+    pointersRef.current.set(event.pointerId, { x, y });
 
     dragStartRef.current = {
       x: event.clientX,
       y: event.clientY,
     };
 
+    // Capture the pointer to continue receiving events even if it leaves the canvas
     event.currentTarget.setPointerCapture(
       event.pointerId
     );
+
+    // Handle pinch zoom if two pointers are down
+    if (pointersRef.current.size === 2) {
+      const [p1, p2] = [...pointersRef.current.values()];
+
+      const centerX = (p1.x + p2.x) / 2;
+      const centerY = (p1.y + p2.y) / 2;
+
+      const distance = Math.hypot(
+        p2.x - p1.x,
+        p2.y - p1.y
+      );
+
+      const viewport = viewportRef.current;
+
+      // Convert pinch center from screen → world coordinates.
+      const worldX =
+        (centerX - viewport.x) / viewport.zoom;
+
+      const worldY =
+        (centerY - viewport.y) / viewport.zoom;
+
+      pinchRef.current = {
+        startDistance: distance,
+        startZoom: viewport.zoom,
+        worldX,
+        worldY,
+      };
+    }
   };
 
   const handlePointerMove = (
     event: React.PointerEvent<HTMLCanvasElement>
   ) => {
-    if (!isDraggingRef.current) {
+    const canvas = canvasRef.current;
+    if (!isDraggingRef.current || !pointersRef.current.has(event.pointerId) || !canvas) {
       return;
     }
+    const { screenX: x, screenY: y } = getPointerPosition(event, canvas);
+    const viewport = viewportRef.current;
+    const dx = event.clientX - dragStartRef.current.x;
+    const dy = event.clientY - dragStartRef.current.y;
 
-    const dx =
-      event.clientX -
-      dragStartRef.current.x;
+    pointersRef.current.set(
+      event.pointerId,
+      { x, y }
+    );
 
-    const dy =
-      event.clientY -
-      dragStartRef.current.y;
+    if (pointersRef.current.size === 1) {
+      viewport.x += dx;
+      viewport.y += dy;
 
-    const viewport =
-      viewportRef.current;
+      dragStartRef.current = {
+        x: event.clientX,
+        y: event.clientY,
+      };
+    } else if (pointersRef.current.size === 2 && pinchRef.current && zoomEnabled) {
+      const [p1, p2] = [...pointersRef.current.values()];
 
-    viewport.x += dx;
-    viewport.y += dy;
+      const distance = Math.hypot(
+        p2.x - p1.x,
+        p2.y - p1.y
+      );
 
-    dragStartRef.current = {
-      x: event.clientX,
-      y: event.clientY,
-    };
+      const centerX = (p1.x + p2.x) / 2;
+      const centerY = (p1.y + p2.y) / 2;
+
+      const pinch = pinchRef.current;
+
+      if (!pinch) {
+        return;
+      }
+
+      // Calculate zoom relative to the original pinch distance.
+      const scale =
+        distance / pinch.startDistance;
+
+      const newZoom = Math.min(
+        maxZoom,
+        Math.max(
+          minZoom,
+          pinch.startZoom * scale
+        )
+      );
+
+      /*
+       * Keep the world point that was originally
+       * underneath the fingers underneath the
+       * current finger center.
+       */
+      viewport.zoom = newZoom;
+
+      viewport.x =
+        centerX - pinch.worldX * newZoom;
+
+      viewport.y =
+        centerY - pinch.worldY * newZoom;
+    }
 
     render();
   };
 
-  const handlePointerUp = () => {
+  const handlePointerUp = (event: React.PointerEvent<HTMLCanvasElement>) => {
     isDraggingRef.current = false;
+    pointersRef.current.delete(event.pointerId);
+
+    if (pointersRef.current.size < 2) {
+      pinchRef.current = null;
+    }
+  };
+
+  const handlePointerCancel = (
+    event: React.PointerEvent<HTMLCanvasElement>
+  ) => {
+    isDraggingRef.current = false;
+    pointersRef.current.delete(event.pointerId);
+    pinchRef.current = null;
   };
 
   const handleClick = (event: React.MouseEvent<HTMLCanvasElement>) => {
@@ -391,6 +490,7 @@ export const TreeCanvas = forwardRef<
       onPointerDown={handlePointerDown}
       onPointerMove={handlePointerMove}
       onPointerUp={handlePointerUp}
+      onPointerCancel={handlePointerCancel}
       onMouseMove={handleMouseMove}
       onDoubleClick={handleDoubleClick}
     />
