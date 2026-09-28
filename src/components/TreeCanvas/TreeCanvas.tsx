@@ -30,6 +30,7 @@ export const TreeCanvas = forwardRef<
     onDoubleClickNode,
   } = props;
   const clickTimeout = useRef<number | null>(null);
+  const hoverTimeout = useRef<number | null>(null);
   const hoveredNodeRef = useRef<string | null>(null);
   const layoutsRef = useRef<NodeLayout[]>([]);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -55,6 +56,9 @@ export const TreeCanvas = forwardRef<
     worldY: number;
   } | null>(null);
 
+  const expandedNodesRef = useRef<Set<string>>(
+    new Set(data.map(node => node.id))
+  );
 
   const render = useCallback(() => {
     const canvas = canvasRef.current;
@@ -79,6 +83,7 @@ export const TreeCanvas = forwardRef<
       edgeType,
       width: canvas.clientWidth,
       height: canvas.clientHeight,
+      expandedNodes: expandedNodesRef.current,
     };
 
     const layouts = renderTree(args);
@@ -92,7 +97,7 @@ export const TreeCanvas = forwardRef<
     edgeType,
   ]);
 
-    useEffect(() => {
+  useEffect(() => {
     const canvas = canvasRef.current;
 
     if (!canvas) return;
@@ -317,26 +322,71 @@ export const TreeCanvas = forwardRef<
     pinchRef.current = null;
   };
 
+  const toggleNode = useCallback(
+    (nodeId: string) => {
+      const viewport = viewportRef.current;
+      const currentLayout = layoutsRef.current.find(
+        layout => layout.node.id === nodeId
+      );
+      const screenX = currentLayout
+        ? (currentLayout.x + currentLayout.width / 2) * viewport.zoom + viewport.x
+        : undefined;
+      const screenY = currentLayout
+        ? (currentLayout.y + currentLayout.height / 2) * viewport.zoom + viewport.y
+        : undefined;
+      const expanded = new Set(
+        expandedNodesRef.current
+      );
+
+      if (expanded.has(nodeId)) {
+        expanded.delete(nodeId);
+      } else {
+        expanded.add(nodeId);
+      }
+
+      expandedNodesRef.current = expanded;
+
+      render();
+
+      if (screenX === undefined || screenY === undefined) return;
+
+      const updatedLayout = layoutsRef.current.find(
+        layout => layout.node.id === nodeId
+      );
+      if (!updatedLayout) return;
+
+      viewport.x =
+        screenX - (updatedLayout.x + updatedLayout.width / 2) * viewport.zoom;
+      viewport.y =
+        screenY - (updatedLayout.y + updatedLayout.height / 2) * viewport.zoom;
+
+      render();
+
+    },
+    [render]
+  );
+
   const handleClick = (event: React.MouseEvent<HTMLCanvasElement>) => {
     if (clickTimeout.current !== null) return;
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    const node = getNodeAtPoint(
+    const { node, toggle } = getNodeAtPoint(
       layoutsRef.current,
       event,
       canvas,
       viewportRef.current
     );
 
-    if (node) {
+    if (node || toggle) {
       clickTimeout.current = setTimeout(() => {
-        console.log("Clicked node:", node.node.id);
-        onNodeClick?.(node.node, event);
+        if (toggle) toggleNode(toggle.node.id);
+        if (node) onNodeClick?.(node.node, event);
         clickTimeout.current = null; // Reset after execution
       }, 250);
     }
   }
+
 
   const handleDoubleClick = (event: React.MouseEvent<HTMLCanvasElement>) => {
     const canvas = canvasRef.current;
@@ -346,7 +396,7 @@ export const TreeCanvas = forwardRef<
     }
     if (!canvas) return;
 
-    const node = getNodeAtPoint(
+    const { node } = getNodeAtPoint(
       layoutsRef.current,
       event,
       canvas,
@@ -355,6 +405,7 @@ export const TreeCanvas = forwardRef<
 
     if (node) {
       console.log("Double-clicked node:", node.node.id);
+
       onDoubleClickNode?.(node.node, event);
     }
   }
@@ -366,30 +417,37 @@ export const TreeCanvas = forwardRef<
       return;
     }
 
-    const node = getNodeAtPoint(
+    if (hoverTimeout.current !== null) {
+      clearTimeout(hoverTimeout.current);
+    }
+    const { node, toggle } = getNodeAtPoint(
       layoutsRef.current,
       event,
       canvas,
       viewportRef.current
     );
-
-    if (node) {
-      const nodeId = node.node.id ?? null;
-
-      // Don't call onHover repeatedly for the same node
-      if (hoveredNodeRef.current === nodeId) {
-        return;
-      }
-
-      hoveredNodeRef.current = nodeId;
-      console.log("Hovered node:", node.node.id);
-      onHoverNode?.(node.node, event);
+    if (node || toggle) {
+      canvas.style.cursor = "pointer";
     } else {
-      if (hoveredNodeRef.current !== null) {
-        hoveredNodeRef.current = null;
-        onHoverNode?.(null, event);
-      }
+      canvas.style.cursor = "default";
     }
+    const nodeId = node?.node.id ?? null;
+    // Don't call onHover repeatedly for the same node
+    if (hoveredNodeRef.current === nodeId) {
+      return;
+    }
+    hoverTimeout.current = setTimeout(() => {
+      if (node) {
+        hoveredNodeRef.current = nodeId;
+        console.log("Hovered node:", node.node.id);
+        onHoverNode?.(node.node, event);
+      } else {
+        if (hoveredNodeRef.current !== null) {
+          hoveredNodeRef.current = null;
+          onHoverNode?.(null, event);
+        }
+      }
+    }, 250); // Debounce for 250ms
   };
 
   const setZoom = useCallback(

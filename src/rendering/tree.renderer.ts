@@ -1,6 +1,6 @@
 import { RenderTreeArgs } from "../types/tree.internal.types";
 import { drawEdges } from "./tree.edges";
-import { calculateTreeLayout } from "../utils/tree.layout";
+import { buildChildrenMap, calculateTreeLayout } from "../utils/tree.layout";
 import { drawNode } from "./tree.node";
 
 
@@ -16,7 +16,9 @@ export function renderTree({
     edgeGap,
     nodeGap,
     edgeType,
+    expandedNodes,
 }: RenderTreeArgs) {
+    const children = buildChildrenMap(data);
     // Clear canvas
     ctx.clearRect(
         0,
@@ -41,12 +43,13 @@ export function renderTree({
     // Calculate node layout
     const layouts =
         calculateTreeLayout(
-            data,
             {
                 nodeWidth,
                 nodeHeight,
                 edgeGap,
                 nodeGap,
+                expandedNodes,
+                children,
             }
         );
 
@@ -56,17 +59,19 @@ export function renderTree({
         layouts,
         edgeType,
     );
-    
+
 
     // Draw nodes
     for (const layout of layouts) {
         drawNode(
             ctx,
-            layout
+            layout,
+            expandedNodes.has(layout.node.id),
+            children.has(layout.node.id),
         );
     }
 
     ctx.restore();
-    
+
     return layouts;
 }

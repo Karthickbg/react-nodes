@@ -1,14 +1,14 @@
 import { Component } from "react";
 
 export interface TreeNode {
-    id: string;
-    parentId?: string;
-    title: string;
-    value: string;
-    width?: number;
-    height?: number;
-    lineType?: "solid" | "dashed";
-    type?: string;
+  id: string;
+  parentId?: string;
+  title: string;
+  value: string;
+  width?: number;
+  height?: number;
+  lineType?: "solid" | "dashed";
+  type?: string;
 }
 
 export interface CustomNodeRendererProps {
@@ -24,7 +24,7 @@ export interface TreeCanvasProps {
   height?: string;
   nodeWidth?: number;
   nodeHeight?: number;
-  
+
   edgeGap?: number;
   nodeGap?: number;
   edgeType?: "bezier" | "polyline";
@@ -34,13 +34,13 @@ export interface TreeCanvasProps {
   initialZoom?: number;
   zoomEnabled?: boolean;
   panEnabled?: boolean;
-  
-  orientation?: "left" | "right" | "top" | "bottom";
+
+  orientation?: "horizontal" | "vertical";
 
   onNodeClick?: (node: TreeNode, event: React.MouseEvent<HTMLCanvasElement>) => void;
   onHoverNode?: (node: TreeNode | null, event: React.MouseEvent<HTMLCanvasElement>) => void;
   onDoubleClickNode?: (node: TreeNode, event: React.MouseEvent<HTMLCanvasElement>) => void;
-  
+
   nodeRenderers?: CustomNodeRendererProps[];
 }
 

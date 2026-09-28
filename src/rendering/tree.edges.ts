@@ -12,7 +12,7 @@ export const drawEdges = (
         ])
     );
 
-    ctx.strokeStyle = "#c7c7c7";
+    ctx.strokeStyle = "#bbbbbb";
     ctx.lineWidth = 2;
 
     for (const layout of layouts) {
@@ -31,7 +31,7 @@ export const drawEdges = (
         }
 
         const startX =
-            parent.x + parent.width;
+            parent.x + parent.width + 10;   // space for expanded/collapsed icon
 
         const startY =
             parent.y + parent.height / 2;
@@ -44,15 +44,15 @@ export const drawEdges = (
         const middleX =
             (startX + endX) / 2;
 
-        ctx.save();    
+        ctx.save();
 
         ctx.beginPath();
         ctx.moveTo(
             startX,
             startY
         );
-        
-        if(edgeType === "polyline") {
+
+        if (edgeType === "polyline") {
 
             ctx.lineTo(
                 middleX,
@@ -80,10 +80,10 @@ export const drawEdges = (
             );
         }
 
-        
+
 
         ctx.setLineDash([layout.node.lineType === "dashed" ? 5 : 0]);
-        
+
         ctx.stroke();
         ctx.restore();
     }

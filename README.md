@@ -101,6 +101,7 @@ react-nodes/
 │   │   └── TreeCanvas/
 │   ├── rendering/
 │   ├── types/
+|   ├── utils/
 │   └── index.ts
 ├── package.json
 ├── tsconfig.json

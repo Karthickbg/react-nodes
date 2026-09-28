@@ -2,7 +2,9 @@ import { NodeLayout } from "../types/tree.internal.types";
 
 export const drawNode = (
     ctx: CanvasRenderingContext2D,
-    layout: NodeLayout
+    layout: NodeLayout,
+    isExpanded: boolean,
+    hasChildren: boolean
 ) => {
     const {
         node,
@@ -54,5 +56,19 @@ export const drawNode = (
         y + 40
     );
 
+    if (hasChildren) {
+        ctx.beginPath();
+        ctx.arc(x + width + 5, y + height / 2, 5, 0, Math.PI * 2, false);
+        ctx.stroke();
+        ctx.closePath();
+        ctx.beginPath();
+        ctx.strokeStyle = "#9c9b9b";
+        ctx.moveTo(x + width + (isExpanded ? 6 : 4), y + (height / 2) - 3);
+        ctx.lineTo(x + width + (isExpanded ? 3 : 7), y + height / 2);
+        ctx.lineTo(x + width + (isExpanded ? 6 : 4), y + (height / 2) + 3);
+        ctx.stroke();
+        ctx.closePath();
+    }
     ctx.restore();
+
 };

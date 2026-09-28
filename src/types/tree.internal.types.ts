@@ -31,6 +31,7 @@ export interface RenderTreeArgs {
     edgeGap: number;
     nodeGap: number;
     edgeType: "bezier" | "polyline";
+    expandedNodes: Set<string>;
 }
 
 
@@ -40,4 +41,6 @@ export interface LayoutOptions {
 
     edgeGap: number;
     nodeGap: number;
+    expandedNodes: Set<string>;
+    children: Map<string | undefined, TreeNode[]>;
 }

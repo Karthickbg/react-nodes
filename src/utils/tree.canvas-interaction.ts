@@ -5,15 +5,23 @@ export const getNodeAtPoint = (
   event: React.MouseEvent<HTMLCanvasElement>,
   canvas: HTMLCanvasElement,
   viewport: Viewport
-): NodeLayout | undefined => {
+): { node: NodeLayout | undefined, toggle: NodeLayout | undefined } => {
   const { x, y } = getWorldPoint(event, canvas, viewport);
 
-  return layouts.find(layout =>
-    x >= layout.x &&
-    x <= layout.x + layout.width &&
-    y >= layout.y &&
-    y <= layout.y + layout.height
-  );
+  return {
+    node: layouts.find(layout =>
+      x >= layout.x &&
+      x <= layout.x + layout.width &&
+      y >= layout.y &&
+      y <= layout.y + layout.height
+    ),
+    toggle: layouts.find(layout =>
+      x >= layout.x + layout.width &&
+      x <= layout.x + layout.width + 10 &&
+      y >= layout.y + (layout.height / 2) - 5 &&
+      y <= layout.y + (layout.height / 2) + 5
+    )
+  };
 }
 
 

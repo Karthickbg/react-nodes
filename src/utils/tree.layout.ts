@@ -1,20 +1,8 @@
 import { TreeNode } from "../types";
 import { LayoutOptions, NodeLayout } from "../types/tree.internal.types";
 
-export function calculateTreeLayout(
-    data: TreeNode[],
-    options: LayoutOptions
-): NodeLayout[] {
-    const {
-        nodeWidth,
-        nodeHeight,
-        edgeGap,
-        nodeGap,
-    } = options;
 
-    const layouts: NodeLayout[] = [];
-
-    // Build parent -> children map
+export const buildChildrenMap = (data: TreeNode[]) => {
     const children =
         new Map<string | undefined, TreeNode[]>();
 
@@ -30,6 +18,23 @@ export function calculateTreeLayout(
         );
     }
 
+    return children;
+}
+
+export const calculateTreeLayout = (
+    options: LayoutOptions
+): NodeLayout[] => {
+    const {
+        nodeWidth,
+        nodeHeight,
+        edgeGap,
+        nodeGap,
+        expandedNodes,
+        children,
+    } = options;
+
+    const layouts: NodeLayout[] = [];
+
     const positionSubtree = (
         node: TreeNode,
         depth: number,
@@ -38,7 +43,7 @@ export function calculateTreeLayout(
         const childNodes =
             children.get(node.id) ?? [];
 
-        if (childNodes.length === 0) {
+        if (childNodes.length === 0 || !expandedNodes.has(node.id)) {
             layouts.push({
                 node,
                 x:
