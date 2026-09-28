@@ -52,9 +52,14 @@ export interface TreeCanvasHandle {
   moveTo(x: number, y: number): void;
   moveBy(dx: number, dy: number): void;
 
-  fitToScreen(): void;
-  center(): void;
   centerNode(nodeId: string): void;
+
+  expand(nodeId: string): void;
+  collapse(nodeId: string): void;
+  toggle(nodeId: string): void;
+
+  expandAll(): void;
+  collapseAll(): void;
 
   refresh(): void;
 }

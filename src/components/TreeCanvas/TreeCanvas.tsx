@@ -366,6 +366,26 @@ export const TreeCanvas = forwardRef<
     [render]
   );
 
+  const centerNode = useCallback(
+    (nodeId: string) => {
+      const viewport = viewportRef.current;
+      const currentLayout = layoutsRef.current.find(
+        layout => layout.node.id === nodeId
+      );
+      if (!currentLayout) return;
+
+      viewport.x =
+        (canvasRef.current?.clientWidth || 0) / 2 -
+        (currentLayout.x + currentLayout.width / 2) * viewport.zoom;
+      viewport.y =
+        (canvasRef.current?.clientHeight || 0) / 2 -
+        (currentLayout.y + currentLayout.height / 2) * viewport.zoom;
+
+      render();
+    },
+    [render]
+  );
+
   const handleClick = (event: React.MouseEvent<HTMLCanvasElement>) => {
     if (clickTimeout.current !== null) return;
     const canvas = canvasRef.current;
@@ -516,21 +536,44 @@ export const TreeCanvas = forwardRef<
         moveBy(dx, dy);
       },
 
-      fitToScreen() {
-        // We'll implement this later.
-      },
-
-      center() {
-        // We'll implement this later.
-      },
-
       centerNode(nodeId: string) {
-        // We'll implement this later.
+        centerNode(nodeId);
       },
 
       refresh() {
         render();
       },
+      expand(nodeId: string) {
+        expandedNodesRef.current.add(nodeId);
+        render();
+      },
+
+      collapse(nodeId: string) {
+        expandedNodesRef.current.delete(nodeId);
+        render();
+      },
+
+      toggle(nodeId: string) {
+        if (expandedNodesRef.current.has(nodeId)) {
+          expandedNodesRef.current.delete(nodeId);
+        } else {
+          expandedNodesRef.current.add(nodeId);
+        }
+        render();
+      },
+
+      expandAll() {
+        const allNodeIds = new Set(
+          data.map(node => node.id)
+        );
+        expandedNodesRef.current = allNodeIds;
+        render();
+      },
+
+      collapseAll() {
+        expandedNodesRef.current.clear();
+        render();
+      }
     }),
     [
       setZoom,
