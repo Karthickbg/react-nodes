@@ -13,14 +13,14 @@ export default defineConfig({
   build: {
     lib: {
       entry: 'src/index.ts',
-      name: 'ReactNodes',
+      name: 'ReactTreeCanvas',
       formats: ['es', 'cjs'],
       fileName: (format) => {
         if (format === 'es') {
-          return 'react-nodes.js';
+          return 'react-tree-canvas.js';
         }
 
-        return 'react-nodes.cjs';
+        return 'react-tree-canvas.cjs';
       },
     },
 

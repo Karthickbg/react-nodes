@@ -1,26 +1,26 @@
 {
-  "name": "react-nodes",
+  "name": "react-tree-canvas",
   "version": "1.0.0",
   "description": "A React component library",
   "type": "module",
-  "main": "./dist/react-nodes.cjs",
-  "module": "./dist/react-nodes.js",
+  "main": "./dist/react-tree-canvas.cjs",
+  "module": "./dist/react-tree-canvas.js",
   "types": "./dist/index.d.ts",
   "repository": {
     "type": "git",
-    "url": "https://github.com/Karthickbg/react-nodes.git"
+    "url": "https://github.com/Karthickbg/react-tree-canvas.git"
   },
   "bugs": {
-    "url": "https://github.com/Karthickbg/react-nodes/issues"
+    "url": "https://github.com/Karthickbg/react-tree-canvas/issues"
   },
-  "homepage": "https://github.com/Karthickbg/react-nodes#readme",
+  "homepage": "https://github.com/Karthickbg/react-tree-canvas#readme",
   "author": "Karthick Balaguru",
   "keywords": ["react", "canvas", "tree", "organizational-chart", "hierarchy"],
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "import": "./dist/react-nodes.js",
-      "require": "./dist/react-nodes.cjs"
+      "import": "./dist/react-tree-canvas.js",
+      "require": "./dist/react-tree-canvas.cjs"
     }
   },
   "files": [
