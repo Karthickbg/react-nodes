@@ -22,10 +22,10 @@
     "preview": "vite preview",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
+    "prepare": "husky",
     "format": "prettier --write .",
     "format:check": "prettier --check ."
   },
-  "prettier": "@spotify/prettier-config",
   "lint-staged": {
     "*.{js,jsx,ts,tsx,json,css,md}": "prettier --write"
   },
@@ -39,6 +39,8 @@
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
     "@vitejs/plugin-react": "^5.0.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^17.6.0",
     "prettier": "^3.9.9",
     "react-tiny-popover": "^8.1.6",
     "storybook": "^10.5.10",
