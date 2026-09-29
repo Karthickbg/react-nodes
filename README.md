@@ -1,6 +1,6 @@
-# react-nodes
+# react-tree-canvas
 
-`react-nodes` is a React and TypeScript library for displaying hierarchical data as an interactive canvas tree. It provides automatic tree layout, horizontal and vertical orientations, expandable branches, node callbacks, pan and zoom controls, and an imperative API for controlling the view.
+`react-tree-canvas` is a React and TypeScript library for displaying hierarchical data as an interactive canvas tree. It provides automatic tree layout, horizontal and vertical orientations, expandable branches, node callbacks, pan and zoom controls, and an imperative API for controlling the view.
 
 ![React Nodes service tree mockup](react-nodes-mockup.svg)
 
@@ -15,7 +15,7 @@ React 18 or newer and React DOM are peer dependencies and should already be inst
 ## Quick Start
 
 ```tsx
-import { TreeCanvas, type TreeNode } from 'react-nodes';
+import { TreeCanvas, type TreeNode } from 'react-tree-canvas';
 
 const data: TreeNode[] = [
   { id: 'company', title: 'Company', value: 'Northwind' },
@@ -163,7 +163,7 @@ Use `TreeCanvasHandle` to control the tree from a parent component:
 
 ```tsx
 import { useRef } from 'react';
-import { TreeCanvas, type TreeCanvasHandle, type TreeNode } from 'react-nodes';
+import { TreeCanvas, type TreeCanvasHandle, type TreeNode } from 'react-tree-canvas';
 
 const data: TreeNode[] = [
   { id: 'root', title: 'Root', value: 'Overview' },
@@ -216,7 +216,7 @@ import type {
   TreeCanvasHandle,
   TreeCanvasProps,
   TreeNode,
-} from 'react-nodes';
+} from 'react-tree-canvas';
 ```
 
 ## Development
@@ -234,7 +234,7 @@ npm run build
 npm run build-storybook
 ```
 
-The package build writes ESM, CommonJS, and declaration outputs to `dist/`. Storybook examples are available at [react-nodes Storybook](https://karthickbg.github.io/react-tree-canvas/).
+The package build writes ESM, CommonJS, and declaration outputs to `dist/`. Storybook examples are available at [react-tree-canvas Storybook](https://karthickbg.github.io/react-tree-canvas/).
 
 You can play with these code sandbox examples:
 
