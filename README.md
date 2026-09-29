@@ -2,6 +2,8 @@
 
 `react-nodes` is a React and TypeScript library for displaying hierarchical data as an interactive canvas tree. It provides automatic tree layout, horizontal and vertical orientations, expandable branches, node callbacks, pan and zoom controls, and an imperative API for controlling the view.
 
+![React Nodes service tree mockup](react-nodes-mockup.svg)
+
 ## Installation
 
 ```bash
@@ -52,9 +54,10 @@ The canvas fills its `width` and `height` defaults (`100%` each), so its parent 
 | `title` | `string` | Yes | Short label drawn above the value. |
 | `value` | `string` | Yes | Main text drawn inside the node. |
 | `lineType` | `"solid" \| "dashed"` | No | Style of the edge connecting this node to its parent. Defaults to `"solid"`. |
-| `width` | `number` | No | Reserved in the current type; node sizing currently uses the `nodeWidth` component prop. |
-| `height` | `number` | No | Reserved in the current type; node sizing currently uses the `nodeHeight` component prop. |
-| `type` | `string` | No | Reserved for custom node rendering; it does not currently change the rendered node. |
+| `edgeColor` | `string` | No | CSS canvas color for the edge connecting this node to its parent. Defaults to gray. |
+| `width` | `number` | No | Per-node width override; otherwise uses the `nodeWidth` component prop. |
+| `height` | `number` | No | Per-node height override; otherwise uses the `nodeHeight` component prop. |
+| `type` | `string` | No | Matches the node renderer in `nodeRenderers`; unmatched nodes use the default drawing. |
 
 ## Component Props
 
@@ -74,10 +77,83 @@ The canvas fills its `width` and `height` defaults (`100%` each), so its parent 
 | `initialZoom` | `number` | `1` | Starting zoom, constrained by the zoom bounds. |
 | `zoomEnabled` | `boolean` | `true` | Enables mouse-wheel and pinch zoom. |
 | `panEnabled` | `boolean` | `true` | Enables pointer-drag movement and touch pointer tracking. |
+| `showExpandCollapse` | `boolean` | `true` | Shows the expand/collapse indicators and enables clicking their toggle targets. The imperative expansion methods remain available when hidden. |
+| `expandCollapseRenderer` | `ExpandCollapseRendererProps` | — | Custom drawing callback and dimensions for expand/collapse indicators. |
 | `onNodeClick` | `(node, event) => void` | — | Called when a node is clicked. A single click is delayed briefly to distinguish it from a double-click. |
 | `onDoubleClickNode` | `(node, event) => void` | — | Called when a node is double-clicked. |
 | `onHoverNode` | `(node \| null, event) => void` | — | Called when the hovered node changes; receives `null` when the pointer leaves the nodes. |
-| `nodeRenderers` | `CustomNodeRendererProps[]` | — | Reserved for custom node rendering. The current renderer does not yet invoke these renderers. |
+| `nodeRenderers` | `CustomNodeRendererProps[]` | — | Custom drawing callbacks, selected by matching `TreeNode.type` to a renderer's `type`. A match replaces the default card drawing. |
+
+### Custom Node Drawing
+
+Provide a renderer for nodes whose `type` matches the renderer's `type`. The `draw` callback receives the canvas context and a `DOMRect` containing the node's canvas-space bounds. Node-level `width` and `height` take precedence over the component's `nodeWidth` and `nodeHeight` defaults; the resolved dimensions are available in `rect`.
+
+| Renderer field | Type | Default | Description |
+| --- | --- | --- | --- |
+| `type` | `string` | Required | Matches `TreeNode.type`. |
+| `draw` | `({ ctx, rect }, node) => void` | Required | Draws the custom node in canvas coordinates, replacing the default card drawing. |
+| `allowOverlay` | `boolean` | `false` | Opts matching nodes into a DOM overlay while hovered. |
+| `overlayRenderer` | `(node) => ReactNode` | — | Returns the React content mounted over the hovered node when `allowOverlay` is `true`. |
+
+### Custom Expand/Collapse Icons
+
+Pass `expandCollapseRenderer` to replace the built-in icon. Its dimensions determine the drawing bounds, clickable area, and reserved space between levels and edges. The callback receives the canvas context, icon `rect`, expanded state, orientation, and node. When omitted, the default 10-by-10 indicator is used.
+
+```tsx
+const expandCollapseRenderer: ExpandCollapseRendererProps = {
+  width: 18,
+  height: 18,
+  draw: ({ ctx, rect }, isExpanded, orientation) => {
+    ctx.fillStyle = isExpanded ? "#34735b" : "#ffffff";
+    ctx.strokeStyle = "#34735b";
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.roundRect(rect.x, rect.y, rect.width, rect.height, 5);
+    ctx.fill();
+    ctx.stroke();
+
+    ctx.strokeStyle = isExpanded ? "#ffffff" : "#34735b";
+    ctx.beginPath();
+    if (orientation === "horizontal") {
+      ctx.moveTo(rect.x + rect.width * 0.4, rect.y + rect.height * 0.25);
+      ctx.lineTo(rect.x + rect.width * 0.65, rect.y + rect.height * 0.5);
+      ctx.lineTo(rect.x + rect.width * 0.4, rect.y + rect.height * 0.75);
+    } else {
+      ctx.moveTo(rect.x + rect.width * 0.25, rect.y + rect.height * 0.4);
+      ctx.lineTo(rect.x + rect.width * 0.5, rect.y + rect.height * 0.65);
+      ctx.lineTo(rect.x + rect.width * 0.75, rect.y + rect.height * 0.4);
+    }
+    ctx.stroke();
+  },
+};
+
+<TreeCanvas data={data} expandCollapseRenderer={expandCollapseRenderer} />;
+```
+
+```tsx
+const nodeRenderers: CustomNodeRendererProps[] = [
+  {
+    type: "status",
+    draw: ({ ctx, rect }, node) => {
+      ctx.fillStyle = "#e4f2eb";
+      ctx.fillRect(rect.x, rect.y, rect.width, rect.height);
+      ctx.fillStyle = "#173d2e";
+      ctx.fillText(node.title, rect.x + 10, rect.y + 20);
+      ctx.fillText(node.value, rect.x + 10, rect.y + 40);
+    },
+  },
+];
+
+const data: TreeNode[] = [
+  { id: "healthy", title: "Service", value: "Healthy", type: "status", width: 180, height: 64 },
+];
+
+<TreeCanvas data={data} nodeRenderers={nodeRenderers} />;
+```
+
+The custom `draw` callback replaces the default card and text drawing; built-in expand/collapse indicators are still drawn for parent nodes when enabled. The main exported types are `TreeNode`, `TreeCanvasProps`, `TreeCanvasHandle`, and `CustomNodeRendererProps`.
+
+Set `allowOverlay: true` and provide `overlayRenderer` to mount a React overlay over the matching custom node while it is hovered. The overlay follows the node as the tree pans, zooms, or relayouts, and is removed from the DOM when the pointer leaves the node. Custom-rendered nodes have no hover delay; the default hover delay remains for built-in nodes. Keep overlays lightweight for large trees.
 
 The callback event arguments are React mouse events for the canvas. The canvas uses CSS-pixel coordinates for layout and view movement.
 
@@ -133,10 +209,10 @@ Pointer dragging pans the view when `panEnabled` is on. Mouse-wheel and pinch zo
 
 ## TypeScript
 
-The package includes TypeScript declarations. The main exported types are `TreeNode`, `TreeCanvasProps`, and `TreeCanvasHandle`:
+The package includes TypeScript declarations. The main exported types are `TreeNode`, `TreeCanvasProps`, `TreeCanvasHandle`, `CustomNodeRendererProps`, and `ExpandCollapseRendererProps`:
 
 ```tsx
-import type { TreeCanvasHandle, TreeCanvasProps, TreeNode } from "react-nodes";
+import type { CustomNodeRendererProps, ExpandCollapseRendererProps, TreeCanvasHandle, TreeCanvasProps, TreeNode } from "react-nodes";
 ```
 
 ## Development

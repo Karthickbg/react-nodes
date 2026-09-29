@@ -41,6 +41,33 @@ export const calculateTreeLayout = (
     } = options;
 
     const layouts: NodeLayout[] = [];
+    const maxPrimarySizeByDepth = new Map<number, number>();
+
+    const collectLevelSizes = (node: TreeNode, depth: number) => {
+        const width = node.width ?? nodeWidth;
+        const height = node.height ?? nodeHeight;
+        const primarySize = orientation === "horizontal" ? width : height;
+        const currentMax = maxPrimarySizeByDepth.get(depth) ?? 0;
+        maxPrimarySizeByDepth.set(depth, Math.max(currentMax, primarySize));
+
+        if (expandedNodes.has(node.id)) {
+            for (const child of childrenMap.get(node.id) ?? []) {
+                collectLevelSizes(child, depth + 1);
+            }
+        }
+    };
+
+    const roots = childrenMap.get(undefined) ?? [];
+    for (const root of roots) {
+        collectLevelSizes(root, 0);
+    }
+
+    const primaryOffsetByDepth = new Map<number, number>();
+    let primaryOffset = 0;
+    for (let depth = 0; maxPrimarySizeByDepth.has(depth); depth += 1) {
+        primaryOffsetByDepth.set(depth, primaryOffset);
+        primaryOffset += maxPrimarySizeByDepth.get(depth)! + levelGap;
+    }
 
     const positionSubtree = (
         node: TreeNode,
@@ -49,33 +76,36 @@ export const calculateTreeLayout = (
     ): number => {
         const childNodes = childrenMap.get(node.id) ?? [];
         const isExpanded = expandedNodes.has(node.id);
+        const width = node.width ?? nodeWidth;
+        const height = node.height ?? nodeHeight;
+        const levelOffset = primaryOffsetByDepth.get(depth) ?? 0;
 
         if (childNodes.length === 0 || !isExpanded) {
             if (orientation === "horizontal") {
                 layouts.push(
                     createNodeLayout(
                         node,
-                        depth * (nodeWidth + levelGap),
+                        levelOffset,
                         offset,
-                        nodeWidth,
-                        nodeHeight
+                        width,
+                        height
                     )
                 );
 
-                return offset + nodeHeight + nodeGap;
+                return offset + height + nodeGap;
             }
 
             layouts.push(
                 createNodeLayout(
                     node,
                     offset,
-                    depth * (nodeHeight + levelGap),
-                    nodeWidth,
-                    nodeHeight
+                    levelOffset,
+                    width,
+                    height
                 )
             );
 
-            return offset + nodeWidth + nodeGap;
+            return offset + width + nodeGap;
         }
 
         const startOffset = offset;
@@ -90,10 +120,10 @@ export const calculateTreeLayout = (
             layouts.push(
                 createNodeLayout(
                     node,
-                    depth * (nodeWidth + levelGap),
-                    (startOffset + endOffset) / 2 - nodeHeight / 2,
-                    nodeWidth,
-                    nodeHeight
+                    levelOffset,
+                    (startOffset + endOffset) / 2 - height / 2,
+                    width,
+                    height
                 )
             );
 
@@ -103,17 +133,15 @@ export const calculateTreeLayout = (
         layouts.push(
             createNodeLayout(
                 node,
-                (startOffset + endOffset) / 2 - nodeWidth / 2,
-                depth * (nodeHeight + levelGap),
-                nodeWidth,
-                nodeHeight
+                    (startOffset + endOffset) / 2 - width / 2,
+                    levelOffset,
+                    width,
+                    height
             )
         );
 
         return offset;
     };
-
-    const roots = childrenMap.get(undefined) ?? [];
 
     let offset = 0;
 

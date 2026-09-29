@@ -1,0 +1,155 @@
+<svg aria-labelledby="title description" role="img" viewBox="57.01149425287357 213.44 1329.655172413793 688.16" xmlns="http://www.w3.org/2000/svg" style="max-height: 500px" width="1329.655172413793" height="688.16">
+  <title>React Nodes interactive service tree</title>
+  <desc id="description">A canvas tree with service metric nodes, pan and zoom controls, and a hovered node detail overlay.</desc>
+  <defs>
+    <pattern patternUnits="userSpaceOnUse" height="28" width="28" id="grid">
+      <path stroke-width="1" stroke="#e7eeea" fill="none" d="M 28 0 L 0 0 0 28"/>
+    </pattern>
+    <filter height="150%" width="140%" y="-20%" x="-20%" id="shadow">
+      <feDropShadow flood-opacity="0.15" flood-color="#243b32" stdDeviation="12" dy="8" dx="0"/>
+    </filter>
+    <filter height="150%" width="140%" y="-20%" x="-20%" id="smallShadow">
+      <feDropShadow flood-opacity="0.08" flood-color="#243b32" stdDeviation="5" dy="3" dx="0"/>
+    </filter>
+  </defs>
+
+  <rect fill="#edf2ef" height="920" width="1440"/>
+  <rect fill="#ffffff" height="78" width="1440" y="0" x="0"/>
+  <path stroke="#dce5df" d="M0 77.5H1440"/>
+
+  <g transform="translate(46 23)">
+    <path stroke-linejoin="round" stroke-linecap="round" stroke-width="3" stroke="#327c5e" fill="none" d="M8 22L22 8L36 22M22 8V34M8 22V35M36 22V35"/>
+    <circle fill="#327c5e" r="3.5" cy="35" cx="8"/>
+    <circle fill="#e39c54" r="3.5" cy="35" cx="22"/>
+    <circle fill="#327c5e" r="3.5" cy="35" cx="36"/>
+    <text font-weight="700" font-size="23" font-family="'Segoe UI', sans-serif" fill="#19342a" y="28" x="54">react-nodes</text>
+    <text letter-spacing="1.4" font-size="10" font-family="'Segoe UI', sans-serif" fill="#75847c" y="47" x="54">CANVAS TREE TOOLKIT</text>
+  </g>
+  <text font-size="13" font-family="'Segoe UI', sans-serif" fill="#65756c" y="44" x="1130">Docs</text>
+  <text font-size="13" font-family="'Segoe UI', sans-serif" fill="#65756c" y="44" x="1190">Examples</text>
+  <rect fill="#193c2e" rx="7" height="38" width="126" y="20" x="1268"/>
+  <text font-weight="600" font-size="12" font-family="'Segoe UI', sans-serif" fill="#ffffff" text-anchor="middle" y="44" x="1331">API reference</text>
+
+  <text letter-spacing="1.7" font-weight="700" font-size="11" font-family="'Segoe UI', sans-serif" fill="#438367" y="130" x="72">INTERACTIVE HIERARCHIES</text>
+  <text font-weight="700" font-size="32" font-family="'Segoe UI', sans-serif" fill="#18342a" y="173" x="72">Service topology</text>
+  <text font-size="14" font-family="'Segoe UI', sans-serif" fill="#6c7c73" y="198" x="72">Follow dependencies, compare live metrics, and inspect a node without leaving the canvas.</text>
+
+  <g transform="translate(1068 132)">
+    <circle fill="#4c9a70" r="4" cy="8" cx="8"/>
+    <text font-weight="600" font-size="11" font-family="'Segoe UI', sans-serif" fill="#52645a" y="12" x="20">LIVE TREE</text>
+    <text font-weight="700" font-size="17" font-family="'Segoe UI', sans-serif" fill="#1d3b30" y="43" x="0">18</text>
+    <text font-size="11" font-family="'Segoe UI', sans-serif" fill="#7c8982" y="43" x="22">nodes</text>
+    <text font-weight="700" font-size="17" font-family="'Segoe UI', sans-serif" fill="#1d3b30" y="43" x="94">4</text>
+    <text font-size="11" font-family="'Segoe UI', sans-serif" fill="#7c8982" y="43" x="111">levels</text>
+    <text font-weight="700" font-size="17" font-family="'Segoe UI', sans-serif" fill="#1d3b30" y="43" x="180">3</text>
+    <text font-size="11" font-family="'Segoe UI', sans-serif" fill="#7c8982" y="43" x="197">groups</text>
+  </g>
+
+  <rect stroke="#dbe4de" fill="#ffffff" rx="9" height="58" width="1296" y="224" x="72"/>
+  <text font-weight="700" font-size="11" font-family="'Segoe UI', sans-serif" fill="#627269" y="258" x="94">ORIENTATION</text>
+  <rect fill="#f0f5f1" rx="6" height="36" width="176" y="235" x="182"/>
+  <rect stroke="#d5e1d9" fill="#ffffff" rx="5" height="32" width="84" y="237" x="184"/>
+  <text font-weight="700" font-size="11" font-family="'Segoe UI', sans-serif" fill="#24523d" text-anchor="middle" y="257" x="226">Horizontal</text>
+  <text font-size="11" font-family="'Segoe UI', sans-serif" fill="#738078" text-anchor="middle" y="257" x="313">Vertical</text>
+  <path stroke="#e2e8e4" d="M382 237V269"/>
+  <text font-weight="700" font-size="11" font-family="'Segoe UI', sans-serif" fill="#627269" y="258" x="405">EDGES</text>
+  <rect fill="#f0f5f1" rx="6" height="36" width="118" y="235" x="458"/>
+  <rect stroke="#d5e1d9" fill="#ffffff" rx="5" height="32" width="58" y="237" x="460"/>
+  <text font-weight="700" font-size="11" font-family="'Segoe UI', sans-serif" fill="#24523d" text-anchor="middle" y="257" x="489">Bezier</text>
+  <text font-size="11" font-family="'Segoe UI', sans-serif" fill="#738078" text-anchor="middle" y="257" x="546">Polyline</text>
+  <path stroke="#e2e8e4" d="M598 237V269"/>
+  <text font-weight="700" font-size="11" font-family="'Segoe UI', sans-serif" fill="#627269" y="258" x="620">VIEW</text>
+  <rect stroke="#e0e7e2" fill="#f5f7f5" rx="6" height="36" width="34" y="235" x="671"/>
+  <text font-size="17" font-family="'Segoe UI', sans-serif" fill="#4d6256" text-anchor="middle" y="258" x="688">-</text>
+  <rect stroke="#e0e7e2" fill="#ffffff" rx="6" height="36" width="72" y="235" x="711"/>
+  <text font-weight="600" font-size="11" font-family="'Segoe UI', sans-serif" fill="#354d40" text-anchor="middle" y="258" x="747">100%</text>
+  <rect stroke="#e0e7e2" fill="#f5f7f5" rx="6" height="36" width="34" y="235" x="789"/>
+  <text font-size="17" font-family="'Segoe UI', sans-serif" fill="#4d6256" text-anchor="middle" y="258" x="806">+</text>
+  <text font-size="11" font-family="'Segoe UI', sans-serif" fill="#849188" text-anchor="end" y="258" x="1318">Updated just now</text>
+
+  <rect stroke="#d5dfd9" fill="#fbfcfb" rx="10" height="548" width="1296" y="300" x="72"/>
+  <rect fill="url(#grid)" rx="9" height="546" width="1294" y="301" x="73"/>
+
+  <g stroke-width="2" stroke="#9db6a7" fill="none">
+    <path d="M368 574H438C482 574 482 418 528 418H574"/>
+    <path d="M438 574C482 574 482 574 528 574H574"/>
+    <path d="M438 574C482 574 482 730 528 730H574"/>
+  </g>
+  <circle fill="#6f9b80" r="4" cy="574" cx="438"/>
+
+  <g filter="url(#smallShadow)">
+    <rect stroke="#cfdbd3" fill="#ffffff" rx="9" height="112" width="238" y="518" x="130"/>
+    <rect fill="#397d60" rx="2.5" height="112" width="5" y="518" x="130"/>
+    <text letter-spacing="1" font-weight="700" font-size="10" font-family="'Segoe UI', sans-serif" fill="#77867d" y="547" x="151">ROOT GROUP</text>
+    <text font-weight="700" font-size="19" font-family="'Segoe UI', sans-serif" fill="#18372b" y="576" x="151">Platform</text>
+    <text font-size="12" font-family="'Segoe UI', sans-serif" fill="#617168" y="600" x="151">4 service groups</text>
+    <circle stroke="#aebfb4" fill="#ffffff" r="10" cy="574" cx="376"/>
+    <path stroke-width="1.5" stroke="#547462" d="M372 574H380M376 570V578"/>
+  </g>
+
+  <g filter="url(#smallShadow)">
+    <rect stroke="#d2ded6" fill="#ffffff" rx="9" height="118" width="272" y="359" x="574"/>
+    <rect fill="#528b6a" rx="2" height="118" width="4" y="359" x="574"/>
+    <text letter-spacing=".8" font-weight="700" font-size="10" font-family="'Segoe UI', sans-serif" fill="#718278" y="385" x="592">TRAFFIC</text>
+    <text font-weight="700" font-size="16" font-family="'Segoe UI', sans-serif" fill="#1b3a2d" y="410" x="592">API Gateway</text>
+    <text font-weight="600" font-size="13" font-family="'Segoe UI', sans-serif" fill="#425f50" y="433" x="592">84 req/s</text>
+    <polyline stroke-linejoin="round" stroke-linecap="round" stroke-width="2" stroke="#4f9974" fill="none" points="592,460 620,453 648,456 676,442 704,449 732,430 760,436 788,418 818,424"/>
+    <circle fill="#317b59" r="3" cy="424" cx="818"/>
+    <circle stroke="#aebfb4" fill="#ffffff" r="10" cy="418" cx="854"/>
+    <path stroke-width="1.5" stroke="#547462" d="M850 418H858M854 414V422"/>
+  </g>
+
+  <g filter="url(#smallShadow)">
+    <rect stroke-width="1.5" stroke="#75a58a" fill="#ffffff" rx="9" height="118" width="272" y="515" x="574"/>
+    <rect fill="#e09a49" rx="2" height="118" width="4" y="515" x="574"/>
+    <text letter-spacing=".8" font-weight="700" font-size="10" font-family="'Segoe UI', sans-serif" fill="#718278" y="541" x="592">LATENCY</text>
+    <text font-weight="700" font-size="16" font-family="'Segoe UI', sans-serif" fill="#1b3a2d" y="566" x="592">Authorization</text>
+    <text font-weight="600" font-size="13" font-family="'Segoe UI', sans-serif" fill="#425f50" y="589" x="592">42.8 ms</text>
+    <polyline stroke-linejoin="round" stroke-linecap="round" stroke-width="2" stroke="#438865" fill="none" points="592,616 620,609 648,612 676,598 704,605 732,585 760,592 788,574 818,580"/>
+    <circle fill-opacity=".35" fill="#f0b66d" r="7" cy="574" cx="788"/>
+    <circle fill="#dd9143" r="3.5" cy="574" cx="788"/>
+    <circle stroke="#aebfb4" fill="#ffffff" r="10" cy="574" cx="854"/>
+    <path stroke-width="1.5" stroke="#547462" d="M850 574H858M854 570V578"/>
+  </g>
+
+  <g filter="url(#smallShadow)">
+    <rect stroke="#d2ded6" fill="#ffffff" rx="9" height="118" width="272" y="671" x="574"/>
+    <rect fill="#547fa0" rx="2" height="118" width="4" y="671" x="574"/>
+    <text letter-spacing=".8" font-weight="700" font-size="10" font-family="'Segoe UI', sans-serif" fill="#718278" y="697" x="592">THROUGHPUT</text>
+    <text font-weight="700" font-size="16" font-family="'Segoe UI', sans-serif" fill="#1b3a2d" y="722" x="592">Catalog Service</text>
+    <text font-weight="600" font-size="13" font-family="'Segoe UI', sans-serif" fill="#425f50" y="745" x="592">88 req/s</text>
+    <polyline stroke-linejoin="round" stroke-linecap="round" stroke-width="2" stroke="#6389a3" fill="none" points="592,772 620,765 648,770 676,750 704,758 732,741 760,748 788,729 818,735"/>
+    <circle stroke="#aebfb4" fill="#ffffff" r="10" cy="730" cx="854"/>
+    <path stroke-width="1.5" stroke="#547462" d="M850 730H858M854 726V734"/>
+  </g>
+
+  <path stroke-dasharray="4 4" stroke-width="1.5" stroke="#d79b53" d="M846 574H885"/>
+  <circle fill="#d79b53" r="3" cy="574" cx="866"/>
+  <g filter="url(#shadow)">
+    <rect stroke="#b9cdc0" fill="#ffffff" rx="11" height="230" width="354" y="452" x="884"/>
+    <path fill="#edf5ef" d="M884 463Q884 452 895 452H1227Q1238 452 1238 463V488H884Z"/>
+    <circle fill="#d99b53" r="4" cy="470" cx="906"/>
+    <text letter-spacing="1" font-weight="700" font-size="10" font-family="'Segoe UI', sans-serif" fill="#547064" y="474" x="919">HOVER OVERLAY</text>
+    <text font-size="10" font-family="'Segoe UI', sans-serif" fill="#839189" text-anchor="end" y="474" x="1215">Authorization</text>
+    <text font-weight="700" font-size="24" font-family="'Segoe UI', sans-serif" fill="#18372b" y="521" x="906">42.8 ms</text>
+    <text font-size="11" font-family="'Segoe UI', sans-serif" fill="#708077" y="543" x="906">p95 request latency</text>
+    <rect fill="#eff6f1" rx="14" height="28" width="110" y="503" x="1102"/>
+    <circle fill="#428a63" r="3" cy="517" cx="1118"/>
+    <text font-weight="600" font-size="10" font-family="'Segoe UI', sans-serif" fill="#397451" y="521" x="1127">HEALTHY</text>
+    <path stroke="#e8eee9" d="M906 606H1214"/>
+    <polyline stroke-linejoin="round" stroke-linecap="round" stroke-width="2.5" stroke="#418764" fill="none" points="908,586 946,578 984,584 1022,565 1060,570 1098,550 1136,559 1174,541 1210,547"/>
+    <circle fill-opacity=".26" fill="#e9ad68" r="8" cy="550" cx="1098"/>
+    <circle fill="#d98838" r="4" cy="550" cx="1098"/>
+    <text font-size="9" font-family="'Segoe UI', sans-serif" fill="#87948c" y="630" x="906">10:02</text>
+    <text font-size="9" font-family="'Segoe UI', sans-serif" fill="#87948c" text-anchor="end" y="630" x="1212">10:09</text>
+    <rect fill="#fbf4e9" rx="5" height="23" width="308" y="647" x="906"/>
+    <text font-weight="600" font-size="10" font-family="'Segoe UI', sans-serif" fill="#94632e" y="663" x="918">10:06 sample</text>
+    <text font-weight="700" font-size="10" font-family="'Segoe UI', sans-serif" fill="#7e582d" text-anchor="end" y="663" x="1202">42.8 ms</text>
+  </g>
+
+  <rect fill="#4d9971" rx="2" height="9" width="9" y="866" x="72"/>
+  <text font-size="10" font-family="'Segoe UI', sans-serif" fill="#718077" y="875" x="89">Canvas-rendered hierarchy</text>
+  <circle fill="#d9954d" r="4.5" cy="870.5" cx="253"/>
+  <text font-size="10" font-family="'Segoe UI', sans-serif" fill="#718077" y="875" x="266">Hovered node with interactive overlay</text>
+  <text font-size="10" font-family="'Segoe UI', sans-serif" fill="#88958d" text-anchor="end" y="875" x="1368">Custom sizes  /  Expandable branches  /  Pan + zoom</text>
+</svg>

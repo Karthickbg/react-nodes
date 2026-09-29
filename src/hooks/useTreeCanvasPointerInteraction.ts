@@ -15,6 +15,10 @@ export const useTreeCanvasPointerInteraction = ({
     requestRender,
     layoutsRef,
     orientation,
+    showExpandCollapse,
+    expandCollapseWidth,
+    expandCollapseHeight,
+    isCustomNode,
     onNodeClick,
     onDoubleClickNode,
     onHoverNode,
@@ -32,6 +36,14 @@ export const useTreeCanvasPointerInteraction = ({
     const clickTimeout = useRef<number | null>(null);
     const hoverTimeout = useRef<number | null>(null);
     const hoveredNodeRef = useRef<string | null>(null);
+
+    const resetHoveredNode = () => {
+      if (hoverTimeout.current !== null) {
+        clearTimeout(hoverTimeout.current);
+        hoverTimeout.current = null;
+      }
+      hoveredNodeRef.current = null;
+    };
 
     useEffect(() => () => {
       if (clickTimeout.current !== null) {
@@ -150,6 +162,9 @@ export const useTreeCanvasPointerInteraction = ({
           canvas,
           viewportRef.current,
           orientation,
+          showExpandCollapse,
+          expandCollapseWidth,
+          expandCollapseHeight,
         );
     
         if (node || toggle) {
@@ -175,7 +190,10 @@ export const useTreeCanvasPointerInteraction = ({
           event,
           canvas,
           viewportRef.current,
-          orientation
+          orientation,
+          showExpandCollapse,
+          expandCollapseWidth,
+          expandCollapseHeight
         );
     
         if (node) {
@@ -194,20 +212,48 @@ export const useTreeCanvasPointerInteraction = ({
     
         if (hoverTimeout.current !== null) {
           clearTimeout(hoverTimeout.current);
+          hoverTimeout.current = null;
         }
+        const previousNodeId = hoveredNodeRef.current;
+        const previousNode = layoutsRef.current.find(
+          layout => layout.node.id === previousNodeId
+        )?.node;
+        const previousWasCustom = previousNode ? isCustomNode(previousNode) : false;
         const { node, toggle } = getNodeAtPoint(
           layoutsRef.current,
           event,
           canvas,
           viewportRef.current,
           orientation,
+          showExpandCollapse,
+          expandCollapseWidth,
+          expandCollapseHeight,
         );
         setCanvasCursor(node || toggle ? "pointer" : "default");
         const nodeId = node?.node.id ?? null;
-        // Don't call onHover repeatedly for the same node
-        if (hoveredNodeRef.current === nodeId) {
+        if (previousNodeId === nodeId) {
           return;
         }
+
+        if (node && isCustomNode(node.node)) {
+          hoveredNodeRef.current = nodeId;
+          onHoverNode?.(node.node, event);
+          return;
+        }
+
+        if (previousWasCustom) {
+          hoveredNodeRef.current = null;
+          onHoverNode?.(null, event);
+        }
+
+        if (!node && previousWasCustom) {
+          return;
+        }
+
+        if (!node && previousNodeId === null) {
+          return;
+        }
+
         hoverTimeout.current = setTimeout(() => {
           if (node) {
             hoveredNodeRef.current = nodeId;
@@ -271,6 +317,7 @@ export const useTreeCanvasPointerInteraction = ({
         handlePointerCancel,
         handleClick,
         handleDoubleClick,
-        handleMouseMove
+        handleMouseMove,
+        resetHoveredNode,
     };
 };

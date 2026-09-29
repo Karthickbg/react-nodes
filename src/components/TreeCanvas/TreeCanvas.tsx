@@ -1,8 +1,8 @@
 'use client'
 
-import { forwardRef, useCallback, useEffect, useImperativeHandle, useRef } from "react";
-import { TreeCanvasHandle, TreeCanvasProps } from "../../types/tree.types";
-import { Viewport } from "../../types/tree.internal.types";
+import { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState } from "react";
+import { ExpandCollapseRendererProps, TreeCanvasHandle, TreeCanvasProps, TreeNode } from "../../types/tree.types";
+import { NodeLayout, Viewport } from "../../types/tree.internal.types";
 import { useTreeCanvasPointerInteraction } from "../../hooks/useTreeCanvasPointerInteraction";
 import { useTreeRenderer } from "../../hooks/useTreeRenderer";
 import { useTreeCanvasActions } from "../../hooks/useTreeCanvasActions";
@@ -26,6 +26,8 @@ export const TreeCanvas = forwardRef<
     initialZoom = 1,
     zoomEnabled = true,
     panEnabled = true,
+    showExpandCollapse = true,
+    expandCollapseRenderer,
     nodeRenderers,
     orientation = "horizontal",
     onNodeClick,
@@ -38,6 +40,10 @@ export const TreeCanvas = forwardRef<
     clampZoom(1, minZoom, maxZoom) ??
     1;
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const overlayLayerRef = useRef<HTMLDivElement>(null);
+  const overlayNodeRef = useRef<HTMLDivElement>(null);
+  const hoveredNodeIdRef = useRef<string | null>(null);
+  const [hoveredNodeId, setHoveredNodeId] = useState<string | null>(null);
   const viewportRef = useRef<Viewport>({
     x: 0,
     y: 0,
@@ -50,6 +56,42 @@ export const TreeCanvas = forwardRef<
     if (canvasRef.current) {
       canvasRef.current.style.cursor = cursor;
     }
+  }, []);
+  const isCustomNode = useCallback(
+    (node: TreeNode) => nodeRenderers?.some(renderer => renderer.type === node.type) ?? false,
+    [nodeRenderers]
+  );
+  const expandCollapseWidth = expandCollapseRenderer?.width ?? 10;
+  const expandCollapseHeight = expandCollapseRenderer?.height ?? 10;
+  const handleHoverNode = useCallback(
+    (node: TreeNode | null, event: React.MouseEvent<HTMLCanvasElement>) => {
+      hoveredNodeIdRef.current = node?.id ?? null;
+      setHoveredNodeId(node?.id ?? null);
+      onHoverNode?.(node, event);
+    },
+    [onHoverNode]
+  );
+  const updateOverlayPosition = useCallback((layouts: NodeLayout[]) => {
+    const viewport = viewportRef.current;
+    const overlayLayer = overlayLayerRef.current;
+    if (overlayLayer) {
+      overlayLayer.style.transform = `translate(${viewport.x}px, ${viewport.y}px) scale(${viewport.zoom})`;
+    }
+
+    const overlayNode = overlayNodeRef.current;
+    if (!overlayNode) return;
+
+    const layout = layouts.find(item => item.node.id === hoveredNodeIdRef.current);
+    if (!layout) {
+      overlayNode.style.display = "none";
+      return;
+    }
+
+    overlayNode.style.display = "block";
+    overlayNode.style.left = `${layout.x}px`;
+    overlayNode.style.top = `${layout.y}px`;
+    overlayNode.style.width = `${layout.width}px`;
+    overlayNode.style.height = `${layout.height}px`;
   }, []);
 
   const expandedNodesRef = useRef<Set<string>>(
@@ -68,11 +110,19 @@ export const TreeCanvas = forwardRef<
     data,
     nodeWidth,
     nodeHeight,
-    levelGap,
+    levelGap: showExpandCollapse
+      ? Math.max(
+          levelGap,
+          orientation === "horizontal" ? expandCollapseWidth : expandCollapseHeight
+        )
+      : levelGap,
     nodeGap,
     edgeType,
     orientation,
+    showExpandCollapse,
+    expandCollapseRenderer,
     nodeRenderers,
+    onRender: updateOverlayPosition,
   })
 
   const setNodeExpanded = useCallback(
@@ -162,7 +212,8 @@ export const TreeCanvas = forwardRef<
     handlePointerCancel,
     handleClick,
     handleDoubleClick,
-    handleMouseMove
+    handleMouseMove,
+    resetHoveredNode,
   } = useTreeCanvasPointerInteraction({
     canvasRef,
     viewportRef,
@@ -175,9 +226,13 @@ export const TreeCanvas = forwardRef<
     requestRender,
     layoutsRef,
     orientation,
+    showExpandCollapse,
+    expandCollapseWidth,
+    expandCollapseHeight,
+    isCustomNode,
     onNodeClick,
     onDoubleClickNode,
-    onHoverNode,
+    onHoverNode: handleHoverNode,
     toggleNode
   });
 
@@ -263,19 +318,70 @@ export const TreeCanvas = forwardRef<
     ]
   );
 
+  const hoveredNode = data.find(node => node.id === hoveredNodeId);
+  const hoveredNodeRenderer = nodeRenderers?.find(
+    renderer => renderer.type === hoveredNode?.type
+  );
+  const overlayContent = hoveredNode &&
+    hoveredNodeRenderer?.allowOverlay === true &&
+    hoveredNodeRenderer.overlayRenderer
+      ? hoveredNodeRenderer.overlayRenderer(hoveredNode)
+      : null;
+  const hoveredLayout = overlayContent
+    ? layoutsRef.current.find(layout => layout.node.id === hoveredNodeId)
+    : undefined;
+
+  const clearHoveredOverlay = () => {
+    resetHoveredNode();
+    hoveredNodeIdRef.current = null;
+    setHoveredNodeId(null);
+  };
+
   return (
-    <canvas
-      ref={canvasRef}
-      onClick={handleClick}
-      id="tree-canvas"
-      className="tree-canvas"
-      style={{ width: width, height: height, display: "block", overscrollBehavior: "contain", touchAction: "none" }}
-      onPointerDown={handlePointerDown}
-      onPointerMove={handlePointerMove}
-      onPointerUp={handlePointerUp}
-      onPointerCancel={handlePointerCancel}
-      onMouseMove={handleMouseMove}
-      onDoubleClick={handleDoubleClick}
-    />
+    <div
+      onMouseLeave={clearHoveredOverlay}
+      style={{ position: "relative", width, height, overflow: "hidden" }}
+    >
+      <canvas
+        ref={canvasRef}
+        onClick={handleClick}
+        id="tree-canvas"
+        className="tree-canvas"
+        style={{ width, height, display: "block", overscrollBehavior: "contain", touchAction: "none" }}
+        onPointerDown={handlePointerDown}
+        onPointerMove={handlePointerMove}
+        onPointerUp={handlePointerUp}
+        onPointerCancel={handlePointerCancel}
+        onMouseMove={handleMouseMove}
+        onDoubleClick={handleDoubleClick}
+      />
+      {overlayContent && hoveredLayout && (
+        <div
+          ref={overlayLayerRef}
+          style={{
+            position: "absolute",
+            inset: 0,
+            transform: `translate(${viewportRef.current.x}px, ${viewportRef.current.y}px) scale(${viewportRef.current.zoom})`,
+            transformOrigin: "top left",
+            pointerEvents: "none",
+            zIndex: 1,
+          }}
+        >
+          <div
+            ref={overlayNodeRef}
+            style={{
+              position: "absolute",
+              left: hoveredLayout.x,
+              top: hoveredLayout.y,
+              width: hoveredLayout.width,
+              height: hoveredLayout.height,
+              pointerEvents: "auto",
+            }}
+          >
+            {overlayContent}
+          </div>
+        </div>
+      )}
+    </div>
   )
 });

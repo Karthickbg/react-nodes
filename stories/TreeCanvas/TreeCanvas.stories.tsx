@@ -2,7 +2,13 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useRef, useState } from "react";
 import { Popover } from "react-tiny-popover";
 
-import { TreeCanvas, type TreeCanvasHandle, type TreeNode } from "../../src";
+import {
+    TreeCanvas,
+    type CustomNodeRendererProps,
+    type ExpandCollapseRendererProps,
+    type TreeCanvasHandle,
+    type TreeNode,
+} from "../../src";
 
 const data: TreeNode[] = [
     {
@@ -351,5 +357,238 @@ function HoverDetailsExample() {
 
 export const HoverDetailsPopover: Story = {
     render: () => <HoverDetailsExample />,
+};
+
+const departmentNodeIds = new Set(["ceo", "cto", "cfo", "coo"]);
+const customRendererData = data.map(node =>
+    departmentNodeIds.has(node.id)
+        ? { ...node, type: "department", width: 210, height: 72 }
+        : node
+);
+
+const departmentRenderer: CustomNodeRendererProps = {
+    type: "department",
+    draw: ({ ctx, rect }, node) => {
+        ctx.fillStyle = "#f1f6f2";
+        ctx.fillRect(rect.x, rect.y, rect.width, rect.height);
+
+        ctx.strokeStyle = "#9bb5a5";
+        ctx.lineWidth = 1;
+        ctx.strokeRect(rect.x, rect.y, rect.width, rect.height);
+
+        ctx.fillStyle = "#34735b";
+        ctx.fillRect(rect.x, rect.y, 5, rect.height);
+
+        ctx.fillStyle = "#60796c";
+        ctx.font = "12px sans-serif";
+        ctx.fillText(node.title, rect.x + 14, rect.y + 25);
+
+        ctx.fillStyle = "#1d382c";
+        ctx.font = "bold 17px sans-serif";
+        ctx.fillText(node.value, rect.x + 14, rect.y + 51);
+    },
+};
+
+export const CustomNodeRenderer: Story = {
+    args: {
+        data: customRendererData,
+        nodeRenderers: [departmentRenderer],
+    },
+};
+
+const metricSeries: Record<string, number[]> = {
+    gateway: [61, 66, 63, 72, 70, 76, 82, 84],
+    auth: [38, 42, 40, 46, 49, 45, 53, 57],
+    catalog: [72, 68, 74, 79, 76, 83, 80, 88],
+    checkout: [24, 29, 27, 33, 31, 38, 36, 42],
+};
+
+const metricData: TreeNode[] = [
+    { id: "gateway", title: "API Gateway", value: "84 req/s", type: "metric", width: 240, height: 132 },
+    { id: "auth", parentId: "gateway", title: "Auth Service", value: "57 req/s", type: "metric", width: 240, height: 132 },
+    { id: "catalog", parentId: "gateway", title: "Catalog Service", value: "88 req/s", type: "metric", width: 240, height: 132 },
+    { id: "checkout", parentId: "gateway", title: "Checkout Service", value: "42 req/s", type: "metric", width: 240, height: 132 },
+];
+
+const drawMetricNode = ({ ctx, rect }: Parameters<CustomNodeRendererProps["draw"]>[0], node: TreeNode) => {
+    const values = metricSeries[node.id] ?? [];
+    const minValue = Math.min(...values);
+    const maxValue = Math.max(...values);
+    const chartLeft = rect.x + 14;
+    const chartTop = rect.y + 84;
+    const chartWidth = rect.width - 28;
+    const chartHeight = 31;
+
+    ctx.fillStyle = "#f2f7f4";
+    ctx.fillRect(rect.x, rect.y, rect.width, rect.height);
+    ctx.strokeStyle = "#c4d4ca";
+    ctx.lineWidth = 1;
+    ctx.strokeRect(rect.x + 0.5, rect.y + 0.5, rect.width - 1, rect.height - 1);
+
+    ctx.fillStyle = "#597468";
+    ctx.font = "11px sans-serif";
+    ctx.fillText(node.title.toUpperCase(), rect.x + 14, rect.y + 24);
+
+    ctx.fillStyle = "#16372a";
+    ctx.font = "bold 21px sans-serif";
+    ctx.fillText(node.value, rect.x + 14, rect.y + 54);
+
+    ctx.fillStyle = "#7b8e84";
+    ctx.font = "10px sans-serif";
+    ctx.fillText("REQUESTS / SECOND", rect.x + 14, rect.y + 73);
+
+    if (values.length < 2) return;
+    ctx.beginPath();
+    values.forEach((value, index) => {
+        const x = chartLeft + (index / (values.length - 1)) * chartWidth;
+        const normalized = maxValue === minValue ? 0.5 : (value - minValue) / (maxValue - minValue);
+        const y = chartTop + chartHeight - normalized * chartHeight;
+        if (index === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+    });
+    ctx.strokeStyle = "#368262";
+    ctx.lineWidth = 2;
+    ctx.stroke();
+};
+
+function MetricNodeOverlay({ node }: { node: TreeNode }) {
+    const values = metricSeries[node.id] ?? [];
+    const [activeIndex, setActiveIndex] = useState(Math.max(0, values.length - 1));
+    const minValue = Math.min(...values);
+    const maxValue = Math.max(...values);
+    const points = values.map((value, index) => {
+        const x = values.length < 2 ? 90 : (index / (values.length - 1)) * 180;
+        const normalized = maxValue === minValue ? 0.5 : (value - minValue) / (maxValue - minValue);
+        return { x, y: 36 - normalized * 30 };
+    });
+    const activePoint = points[activeIndex];
+
+    return (
+        <div
+            style={{
+                boxSizing: "border-box",
+                width: "100%",
+                height: "100%",
+                padding: "13px 14px 10px",
+                overflow: "hidden",
+                border: "1px solid #82aa93",
+                borderLeft: "4px solid #368262",
+                background: "#f7fbf8",
+                boxShadow: "0 5px 15px rgba(23, 55, 42, 0.12)",
+                color: "#16372a",
+                fontFamily: "Arial, sans-serif",
+            }}
+        >
+            <div style={{ color: "#597468", fontSize: 11, fontWeight: 700 }}>
+                {node.title.toUpperCase()}
+            </div>
+            <div style={{ marginTop: 4, fontSize: 21, fontWeight: 700 }}>
+                {node.value}
+            </div>
+            <div style={{ marginTop: 1, color: "#7b8e84", fontSize: 10 }}>
+                REQUESTS / SECOND
+            </div>
+            <svg
+                viewBox="0 0 180 42"
+                preserveAspectRatio="none"
+                aria-label={`${node.title} request rate sparkline`}
+                onMouseMove={event => {
+                    if (values.length < 2) return;
+                    const bounds = event.currentTarget.getBoundingClientRect();
+                    const ratio = Math.max(0, Math.min(1, (event.clientX - bounds.left) / bounds.width));
+                    setActiveIndex(Math.round(ratio * (values.length - 1)));
+                }}
+                style={{ display: "block", width: "100%", height: 36, marginTop: 3, overflow: "visible", cursor: "crosshair" }}
+            >
+                <polyline
+                    points={points.map(point => `${point.x},${point.y}`).join(" ")}
+                    fill="none"
+                    stroke="#368262"
+                    strokeWidth="2"
+                    vectorEffect="non-scaling-stroke"
+                />
+                {activePoint && (
+                    <circle cx={activePoint.x} cy={activePoint.y} r="3.5" fill="#173d2e" />
+                )}
+            </svg>
+            <div aria-live="polite" style={{ color: "#34735b", fontSize: 12, fontWeight: 700 }}>
+                {values[activeIndex] ?? 0} requests/s
+            </div>
+        </div>
+    );
+}
+
+const metricNodeRenderer: CustomNodeRendererProps = {
+    type: "metric",
+    allowOverlay: true,
+    draw: drawMetricNode,
+    overlayRenderer: node => <MetricNodeOverlay node={node} />,
+};
+
+export const CustomNodeOverlay: Story = {
+    render: () => (
+        <div style={{ width: "100%", height: "100vh", padding: 24, boxSizing: "border-box", background: "#edf3ef", fontFamily: "Arial, sans-serif" }}>
+            <h2 style={{ margin: "0 0 5px", color: "#16372a", fontSize: 20 }}>Service metrics</h2>
+            <p style={{ margin: "0 0 16px", color: "#60746a", fontSize: 14 }}>Hover a metric node, then move along its sparkline to inspect individual samples.</p>
+            <div style={{ width: "100%", height: "calc(100% - 65px)", border: "1px solid #cbd8cf", background: "#ffffff" }}>
+                <TreeCanvas
+                    data={metricData}
+                    nodeRenderers={[metricNodeRenderer]}
+                    width="100%"
+                    height="100%"
+                    nodeGap={34}
+                />
+            </div>
+        </div>
+    ),
+};
+
+const edgePalette = ["#ce8050", "#6089a3", "#528e6b", "#b16e74"];
+const customIconData = data.map((node, index) => ({
+    ...node,
+    edgeColor: node.parentId ? edgePalette[index % edgePalette.length] : undefined,
+}));
+
+const customExpandCollapseRenderer: ExpandCollapseRendererProps = {
+    width: 22,
+    height: 22,
+    draw: ({ ctx, rect }, isExpanded, orientation) => {
+        ctx.fillStyle = isExpanded ? "#327c5e" : "#ffffff";
+        ctx.strokeStyle = "#327c5e";
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.roundRect(rect.x, rect.y, rect.width, rect.height, 7);
+        ctx.fill();
+        ctx.stroke();
+
+        const centerX = rect.x + rect.width / 2;
+        const centerY = rect.y + rect.height / 2;
+        ctx.fillStyle = isExpanded ? "#ffffff" : "#327c5e";
+        ctx.beginPath();
+
+        if (orientation === "horizontal") {
+            const tipX = centerX + (isExpanded ? -5 : 5);
+            const baseX = centerX + (isExpanded ? 4 : -4);
+            ctx.moveTo(tipX, centerY);
+            ctx.lineTo(baseX, centerY - 6);
+            ctx.lineTo(baseX, centerY + 6);
+        } else {
+            const tipY = centerY + (isExpanded ? -5 : 5);
+            const baseY = centerY + (isExpanded ? 4 : -4);
+            ctx.moveTo(centerX, tipY);
+            ctx.lineTo(centerX - 6, baseY);
+            ctx.lineTo(centerX + 6, baseY);
+        }
+
+        ctx.closePath();
+        ctx.fill();
+    },
+};
+
+export const CustomExpandCollapseIcon: Story = {
+    args: {
+        data: customIconData,
+        expandCollapseRenderer: customExpandCollapseRenderer,
+    },
 };
 

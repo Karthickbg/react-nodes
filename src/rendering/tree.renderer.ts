@@ -13,8 +13,11 @@ export function renderTree({
     edgeType,
     expandedNodes,
     orientation,
+    showExpandCollapse,
+    expandCollapseRenderer,
     layouts,
     childrenMap,
+    nodeRenderers = []
 }: RenderTreeArgs) {
     // Clear canvas
     ctx.clearRect(
@@ -42,7 +45,9 @@ export function renderTree({
         ctx,
         layouts,
         edgeType,
-        orientation
+        orientation,
+        showExpandCollapse,
+        expandCollapseRenderer
     );
 
 
@@ -53,7 +58,10 @@ export function renderTree({
             layout,
             expandedNodes.has(layout.node.id),
             childrenMap.has(layout.node.id),
-            orientation
+            orientation,
+            showExpandCollapse,
+            expandCollapseRenderer,
+            nodeRenderers.find(renderer => renderer.type === layout.node.type)
         );
     }
 

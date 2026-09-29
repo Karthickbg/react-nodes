@@ -1,1 +1,7 @@
-export type { TreeNode, TreeCanvasHandle, TreeCanvasProps } from "./tree.types";
+export type {
+	CustomNodeRendererProps,
+	ExpandCollapseRendererProps,
+	TreeNode,
+	TreeCanvasHandle,
+	TreeCanvasProps,
+} from "./tree.types";

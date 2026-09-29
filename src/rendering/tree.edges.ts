@@ -1,10 +1,13 @@
 import { NodeLayout } from "../types/tree.internal.types";
+import { ExpandCollapseRendererProps } from "../types/tree.types";
 
 export const drawEdges = (
     ctx: CanvasRenderingContext2D,
     layouts: NodeLayout[],
     edgeType: "bezier" | "polyline",
     orientation: "horizontal" | "vertical",
+    showExpandCollapse: boolean,
+    expandCollapseRenderer?: ExpandCollapseRendererProps
 ) => {
     const isHorizontal = orientation === "horizontal";
     const toCanvasPoint = (primary: number, secondary: number) =>
@@ -18,7 +21,6 @@ export const drawEdges = (
         ])
     );
 
-    ctx.strokeStyle = "#bbbbbb";
     ctx.lineWidth = 2;
 
     for (const layout of layouts) {
@@ -36,14 +38,22 @@ export const drawEdges = (
             continue;
         }
 
-        const iconPadding = 10;
+        const parentWidth = parent.node.width ?? parent.width;
+        const parentHeight = parent.node.height ?? parent.height;
+        const childWidth = layout.node.width ?? layout.width;
+        const childHeight = layout.node.height ?? layout.height;
+        const iconPadding = showExpandCollapse
+            ? isHorizontal
+                ? expandCollapseRenderer?.width ?? 10
+                : expandCollapseRenderer?.height ?? 10
+            : 0;
         const start = toCanvasPoint(
-            isHorizontal ? parent.x + parent.width + iconPadding : parent.y + parent.height + iconPadding,
-            isHorizontal ? parent.y + parent.height / 2 : parent.x + parent.width / 2
+            isHorizontal ? parent.x + parentWidth + iconPadding : parent.y + parentHeight + iconPadding,
+            isHorizontal ? parent.y + parentHeight / 2 : parent.x + parentWidth / 2
         );
         const end = toCanvasPoint(
             isHorizontal ? layout.x : layout.y,
-            isHorizontal ? layout.y + layout.height / 2 : layout.x + layout.width / 2
+            isHorizontal ? layout.y + childHeight / 2 : layout.x + childWidth / 2
         );
         const middlePrimary = (
             (isHorizontal ? start.x : start.y) +
@@ -53,6 +63,7 @@ export const drawEdges = (
         const endSecondary = isHorizontal ? end.y : end.x;
 
         ctx.save();
+        ctx.strokeStyle = layout.node.edgeColor ?? "#bbbbbb";
 
         ctx.beginPath();
         ctx.moveTo(start.x, start.y);

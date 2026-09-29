@@ -24,6 +24,8 @@ export function useTreeRenderer({
   nodeGap,
   edgeType,
   orientation,
+  showExpandCollapse,
+  expandCollapseRenderer,
   nodeRenderers,
   onRender,
 }: UseTreeRendererOptions) {
@@ -55,12 +57,14 @@ export function useTreeRenderer({
       height: canvas.clientHeight,
       expandedNodes: expandedNodesRef.current,
       orientation,
+      showExpandCollapse,
+      expandCollapseRenderer,
       nodeRenderers,
       layouts: layoutsRef.current,
       childrenMap: childrenMapRef.current
     });
 
-    onRender?.();
+    onRender?.(layoutsRef.current);
   }, [
     canvasRef,
     layoutsRef,
@@ -68,6 +72,8 @@ export function useTreeRenderer({
     expandedNodesRef,
     orientation,
     edgeType,
+    showExpandCollapse,
+    expandCollapseRenderer,
     nodeRenderers,
     onRender,
   ]);

@@ -1,5 +1,5 @@
 import { RefObject } from "react";
-import { CustomNodeRendererProps, TreeNode } from "./tree.types";
+import { CustomNodeRendererProps, ExpandCollapseRendererProps, TreeNode } from "./tree.types";
 
 export interface NodeLayout {
     node: TreeNode;
@@ -27,9 +27,11 @@ export interface RenderTreeArgs {
     edgeType: "bezier" | "polyline";
     expandedNodes: Set<string>;
     orientation: "horizontal" | "vertical";
-    nodeRenderers?: CustomNodeRendererProps[];
+    showExpandCollapse: boolean;
+    expandCollapseRenderer?: ExpandCollapseRendererProps;
     layouts: NodeLayout[];
     childrenMap: Map<string | undefined, TreeNode[]>;
+    nodeRenderers?: CustomNodeRendererProps[];
 }
 
 export interface UseTreeRendererProps extends RenderTreeArgs {
@@ -71,6 +73,10 @@ export interface UseTreeCanvasPointerInteractionOptions {
     requestRender: () => void;
     layoutsRef: { current: NodeLayout[] }
     orientation: "horizontal" | "vertical";
+    showExpandCollapse: boolean;
+    expandCollapseWidth: number;
+    expandCollapseHeight: number;
+    isCustomNode: (node: TreeNode) => boolean;
     toggleNode: (nodeId: string) => void;
     onNodeClick?: (node: TreeNode, event: React.MouseEvent<HTMLCanvasElement>) => void;
     onHoverNode?: (node: TreeNode | null, event: React.MouseEvent<HTMLCanvasElement>) => void;
@@ -94,10 +100,12 @@ export interface UseTreeRendererOptions {
 
   edgeType: "bezier" | "polyline";
   orientation: "horizontal" | "vertical";
+    showExpandCollapse: boolean;
+    expandCollapseRenderer?: ExpandCollapseRendererProps;
 
   nodeRenderers?: CustomNodeRendererProps[];
 
-  onRender?: () => void;
+    onRender?: (layouts: NodeLayout[]) => void;
 }
 
 export interface UseTreeCanvasActions {

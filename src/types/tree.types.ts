@@ -1,4 +1,4 @@
-import { Component } from "react";
+import { ReactNode } from "react";
 
 export interface TreeNode {
   id: string;
@@ -8,14 +8,26 @@ export interface TreeNode {
   width?: number;
   height?: number;
   lineType?: "solid" | "dashed";
+  edgeColor?: string;
   type?: string;
+}
+
+export interface ExpandCollapseRendererProps {
+  width: number;
+  height: number;
+  draw: (
+    args: { ctx: CanvasRenderingContext2D; rect: DOMRect },
+    isExpanded: boolean,
+    orientation: "horizontal" | "vertical",
+    node: TreeNode
+  ) => void;
 }
 
 export interface CustomNodeRendererProps {
   type: string;
-  canRender: (node: TreeNode) => boolean;
-  render: (args: { ctx: CanvasRenderingContext2D, rect: DOMRect }, node: TreeNode) => void;
-  overlayRenderer: (node: TreeNode) => Component;
+  draw: (args: { ctx: CanvasRenderingContext2D, rect: DOMRect }, node: TreeNode) => void;
+  allowOverlay?: boolean;
+  overlayRenderer?: (node: TreeNode) => ReactNode;
 }
 
 export interface TreeCanvasProps {
@@ -34,6 +46,8 @@ export interface TreeCanvasProps {
   initialZoom?: number;
   zoomEnabled?: boolean;
   panEnabled?: boolean;
+  showExpandCollapse?: boolean;
+  expandCollapseRenderer?: ExpandCollapseRendererProps;
 
   orientation?: "horizontal" | "vertical";
 
