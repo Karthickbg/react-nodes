@@ -199,6 +199,19 @@ export function TreeWithControls() {
 | `collapseAll()`      | —                               | Collapse all nodes.                                                            |
 | `refresh()`          | —                               | Recalculate and redraw the tree.                                               |
 
+Use `treeRef` to as follows:
+
+```ts
+treeRef.current?.centerNode('root');
+treeRef.current?.zoomTo(1.5);
+treeRef.current?.moveTo(x, y);
+treeRef.current?.expand('node');
+treeRef.current?.collapse('node');
+treeRef.current?.expandAll();
+treeRef.current?.collapseAll();
+treeRef.current?.refresh();
+```
+
 ## Layout and Interaction
 
 Nodes are expanded by default. Clicking a node's expand/collapse control preserves its approximate screen position. When the `data` prop changes, removed IDs are removed from expansion state and newly added nodes start expanded.
