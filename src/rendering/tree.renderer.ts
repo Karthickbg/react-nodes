@@ -7,21 +7,15 @@ import { drawNode } from "./tree.node";
 
 export function renderTree({
     ctx,
-    data,
     viewport,
     width,
     height,
-    nodeWidth,
-    nodeHeight,
-    levelGap,
-    nodeGap,
     edgeType,
     expandedNodes,
     orientation,
-    nodeRenderers,
-    canvas
+    layouts,
+    childrenMap,
 }: RenderTreeArgs) {
-    const children = buildChildrenMap(data);
     // Clear canvas
     ctx.clearRect(
         0,
@@ -43,20 +37,6 @@ export function renderTree({
         viewport.zoom
     );
 
-    // Calculate node layout
-    const layouts =
-        calculateTreeLayout(
-            {
-                nodeWidth,
-                nodeHeight,
-                levelGap,
-                nodeGap,
-                expandedNodes,
-                children,
-                orientation,
-            }
-        );
-
     // Draw connections
     drawEdges(
         ctx,
@@ -72,7 +52,7 @@ export function renderTree({
             ctx,
             layout,
             expandedNodes.has(layout.node.id),
-            children.has(layout.node.id),
+            childrenMap.has(layout.node.id),
             orientation
         );
     }

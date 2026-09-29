@@ -36,7 +36,7 @@ export const calculateTreeLayout = (
         levelGap,
         nodeGap,
         expandedNodes,
-        children,
+        childrenMap,
         orientation,
     } = options;
 
@@ -47,7 +47,7 @@ export const calculateTreeLayout = (
         depth: number,
         offset: number
     ): number => {
-        const childNodes = children.get(node.id) ?? [];
+        const childNodes = childrenMap.get(node.id) ?? [];
         const isExpanded = expandedNodes.has(node.id);
 
         if (childNodes.length === 0 || !isExpanded) {
@@ -113,7 +113,7 @@ export const calculateTreeLayout = (
         return offset;
     };
 
-    const roots = children.get(undefined) ?? [];
+    const roots = childrenMap.get(undefined) ?? [];
 
     let offset = 0;
 

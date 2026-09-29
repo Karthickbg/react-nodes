@@ -6,6 +6,11 @@ export const drawEdges = (
     edgeType: "bezier" | "polyline",
     orientation: "horizontal" | "vertical",
 ) => {
+    const isHorizontal = orientation === "horizontal";
+    const toCanvasPoint = (primary: number, secondary: number) =>
+        isHorizontal
+            ? { x: primary, y: secondary }
+            : { x: secondary, y: primary };
     const layoutMap = new Map(
         layouts.map(layout => [
             layout.node.id,
@@ -31,86 +36,45 @@ export const drawEdges = (
             continue;
         }
 
-        const iconPadding = 10; // space for expanded/collapsed icon
-
-        const startX = orientation === 'horizontal' ? parent.x + parent.width + iconPadding : parent.x + parent.width / 2;   
-
-        const startY = orientation === 'horizontal' ? parent.y + parent.height / 2 : parent.y + parent.height + iconPadding;
-
-        const endX = orientation === 'horizontal' ? layout.x : layout.x + layout.width / 2;
-
-        const endY = orientation === 'horizontal' ? layout.y + layout.height / 2 : layout.y;
-
-        const middleX =
-            (startX + endX) / 2;
-
-        const middleY = (startY + endY) / 2;    
+        const iconPadding = 10;
+        const start = toCanvasPoint(
+            isHorizontal ? parent.x + parent.width + iconPadding : parent.y + parent.height + iconPadding,
+            isHorizontal ? parent.y + parent.height / 2 : parent.x + parent.width / 2
+        );
+        const end = toCanvasPoint(
+            isHorizontal ? layout.x : layout.y,
+            isHorizontal ? layout.y + layout.height / 2 : layout.x + layout.width / 2
+        );
+        const middlePrimary = (
+            (isHorizontal ? start.x : start.y) +
+            (isHorizontal ? end.x : end.y)
+        ) / 2;
+        const startSecondary = isHorizontal ? start.y : start.x;
+        const endSecondary = isHorizontal ? end.y : end.x;
 
         ctx.save();
 
         ctx.beginPath();
-        ctx.moveTo(
-            startX,
-            startY
-        );
+        ctx.moveTo(start.x, start.y);
 
         if (edgeType === "polyline") {
-            if(orientation === 'vertical'){
-                ctx.lineTo(
-                    startX,
-                    middleY,
-                );
-
-                ctx.lineTo(
-                    endX,
-                    middleY
-                );
-
-                ctx.lineTo(
-                    endX,
-                    endY
-                );
-            } else {
-                ctx.lineTo(
-                    middleX,
-                    startY
-                );
-
-                ctx.lineTo(
-                    middleX,
-                    endY
-                );
-
-                ctx.lineTo(
-                    endX,
-                    endY
-                );
-            }
-           
+            const firstBend = toCanvasPoint(middlePrimary, startSecondary);
+            const secondBend = toCanvasPoint(middlePrimary, endSecondary);
+            ctx.lineTo(firstBend.x, firstBend.y);
+            ctx.lineTo(secondBend.x, secondBend.y);
+            ctx.lineTo(end.x, end.y);
         } else {
-            if(orientation === 'horizontal') {
-                ctx.bezierCurveTo(
-                    middleX,
-                    startY,
-                    middleX,
-                    endY,
-                    endX,
-                    endY
-                );
-            } else {
-                ctx.bezierCurveTo(
-                    startX,
-                    middleY,
-                    endX,
-                    middleY,
-                    endX,
-                    endY
-                );
-            }
-            
+            const firstControl = toCanvasPoint(middlePrimary, startSecondary);
+            const secondControl = toCanvasPoint(middlePrimary, endSecondary);
+            ctx.bezierCurveTo(
+                firstControl.x,
+                firstControl.y,
+                secondControl.x,
+                secondControl.y,
+                end.x,
+                end.y
+            );
         }
-
-
 
         ctx.setLineDash([layout.node.lineType === "dashed" ? 5 : 0]);
 
