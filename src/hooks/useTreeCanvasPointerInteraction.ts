@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { UseTreeCanvasPointerInteractionOptions } from '../types/tree.internal.types';
 import {
   getNodeAtPoint,
@@ -313,7 +313,7 @@ export const useTreeCanvasPointerInteraction = ({
     return () => {
       canvas.removeEventListener('wheel', handleWheel);
     };
-  }, [zoomEnabled, minZoom, maxZoom, requestRender, setViewport]);
+  }, [zoomEnabled, minZoom, maxZoom, requestRender, setViewport, canvasRef, viewportRef]);
 
   return {
     handlePointerDown,

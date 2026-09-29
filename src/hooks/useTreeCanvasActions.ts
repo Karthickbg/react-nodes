@@ -23,7 +23,7 @@ export const useTreeCanvasActions = ({
 
       requestRender();
     },
-    [minZoom, maxZoom, requestRender, setViewport],
+    [minZoom, maxZoom, requestRender, setViewport, viewportRef],
   );
 
   const moveTo = useCallback(
@@ -38,7 +38,7 @@ export const useTreeCanvasActions = ({
 
       requestRender();
     },
-    [requestRender, setViewport],
+    [requestRender, setViewport, viewportRef],
   );
 
   const moveBy = useCallback(
@@ -57,7 +57,7 @@ export const useTreeCanvasActions = ({
 
       requestRender();
     },
-    [requestRender, setViewport],
+    [requestRender, setViewport, viewportRef],
   );
 
   const centerNode = useCallback(
@@ -78,7 +78,7 @@ export const useTreeCanvasActions = ({
 
       requestRender();
     },
-    [requestRender, setViewport],
+    [requestRender, setViewport, canvasRef, layoutsRef, viewportRef],
   );
 
   return {

@@ -1,12 +1,7 @@
 'use client';
 
 import { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState } from 'react';
-import {
-  ExpandCollapseRendererProps,
-  TreeCanvasHandle,
-  TreeCanvasProps,
-  TreeNode,
-} from '../../types/tree.types';
+import { TreeCanvasHandle, TreeCanvasProps, TreeNode } from '../../types/tree.types';
 import { NodeLayout, Viewport } from '../../types/tree.internal.types';
 import { useTreeCanvasPointerInteraction } from '../../hooks/useTreeCanvasPointerInteraction';
 import { useTreeRenderer } from '../../hooks/useTreeRenderer';
@@ -189,7 +184,7 @@ export const TreeCanvas = forwardRef<TreeCanvasHandle, TreeCanvasProps>((props, 
 
       requestRender();
     },
-    [toggleExpandedNode, requestRender],
+    [toggleExpandedNode, requestRender, layoutsRef, viewportRef],
   );
 
   const {
@@ -285,6 +280,7 @@ export const TreeCanvas = forwardRef<TreeCanvasHandle, TreeCanvasProps>((props, 
     }),
     [
       setZoom,
+      centerNode,
       moveTo,
       moveBy,
       requestRender,

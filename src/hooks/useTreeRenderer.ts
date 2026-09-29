@@ -83,7 +83,7 @@ export function useTreeRenderer({
       orientation,
       expandedNodes: expandedNodesRef.current,
     });
-  }, [data, nodeWidth, nodeHeight, levelGap, nodeGap, orientation]);
+  }, [data, nodeWidth, nodeHeight, levelGap, nodeGap, orientation, expandedNodesRef]);
 
   const drawRef = useRef(draw);
   drawRef.current = draw;
