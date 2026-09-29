@@ -1,9 +1,8 @@
 import { RenderTreeArgs } from "../types/tree.internal.types";
 import { drawEdges } from "./tree.edges";
-import { buildChildrenMap, calculateTreeLayout } from "../utils/tree.layout";
 import { drawNode } from "./tree.node";
 
-
+// TODO: add virtualization, double buffering / blit if needed
 
 export function renderTree({
     ctx,
