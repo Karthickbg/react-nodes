@@ -6,6 +6,16 @@
   "main": "./dist/react-nodes.cjs",
   "module": "./dist/react-nodes.js",
   "types": "./dist/index.d.ts",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Karthickbg/react-nodes.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Karthickbg/react-nodes/issues"
+  },
+  "homepage": "https://github.com/Karthickbg/react-nodes#readme",
+  "author": "Karthick Balaguru",
+  "keywords": ["react", "canvas", "tree", "organizational-chart", "hierarchy"],
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
