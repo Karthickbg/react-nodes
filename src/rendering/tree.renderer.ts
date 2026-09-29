@@ -13,10 +13,13 @@ export function renderTree({
     height,
     nodeWidth,
     nodeHeight,
-    edgeGap,
+    levelGap,
     nodeGap,
     edgeType,
     expandedNodes,
+    orientation,
+    nodeRenderers,
+    canvas
 }: RenderTreeArgs) {
     const children = buildChildrenMap(data);
     // Clear canvas
@@ -46,10 +49,11 @@ export function renderTree({
             {
                 nodeWidth,
                 nodeHeight,
-                edgeGap,
+                levelGap,
                 nodeGap,
                 expandedNodes,
                 children,
+                orientation,
             }
         );
 
@@ -58,6 +62,7 @@ export function renderTree({
         ctx,
         layouts,
         edgeType,
+        orientation
     );
 
 
@@ -68,6 +73,7 @@ export function renderTree({
             layout,
             expandedNodes.has(layout.node.id),
             children.has(layout.node.id),
+            orientation
         );
     }
 

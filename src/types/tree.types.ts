@@ -25,7 +25,7 @@ export interface TreeCanvasProps {
   nodeWidth?: number;
   nodeHeight?: number;
 
-  edgeGap?: number;
+  levelGap?: number;
   nodeGap?: number;
   edgeType?: "bezier" | "polyline";
 

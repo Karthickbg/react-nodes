@@ -112,6 +112,23 @@ const data: TreeNode[] = [
         title: "Human Resources",
         value: "5 employees",
     },
+    {
+        id: "founder",
+        title: "Founder",
+        value: "Steve Wallace",
+    },
+    {
+        id: "advisor",
+        parentId: "founder",
+        title: "Advisor",
+        value: "Jane Doe",
+    },
+    {
+        id: "cofounder",
+        parentId: "founder",
+        title: "Co-Founder",
+        value: "Alice Johnson",
+    }
 ];
 
 const meta = {

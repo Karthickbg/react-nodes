@@ -16,7 +16,7 @@ export const TreeCanvas = forwardRef<
     data,
     nodeWidth = 150,
     nodeHeight = 50,
-    edgeGap = 150,
+    levelGap = 150,
     nodeGap = 30,
     edgeType = "bezier",
     minZoom = 0.2,
@@ -25,6 +25,7 @@ export const TreeCanvas = forwardRef<
     zoomEnabled = true,
     panEnabled = true,
     nodeRenderers,
+    orientation = "horizontal",
     onNodeClick,
     onHoverNode,
     onDoubleClickNode,
@@ -70,6 +71,7 @@ export const TreeCanvas = forwardRef<
     if (!ctx) return;
 
     const args: RenderTreeArgs = {
+      canvas,
       ctx,
       data,
 
@@ -78,12 +80,14 @@ export const TreeCanvas = forwardRef<
       nodeWidth,
       nodeHeight,
 
-      edgeGap,
+      levelGap,
       nodeGap,
       edgeType,
       width: canvas.clientWidth,
       height: canvas.clientHeight,
       expandedNodes: expandedNodesRef.current,
+      orientation,
+      nodeRenderers,
     };
 
     const layouts = renderTree(args);
@@ -92,9 +96,11 @@ export const TreeCanvas = forwardRef<
     data,
     nodeWidth,
     nodeHeight,
-    edgeGap,
+    levelGap,
     nodeGap,
     edgeType,
+    orientation,
+    nodeRenderers,
   ]);
 
   useEffect(() => {
@@ -395,7 +401,8 @@ export const TreeCanvas = forwardRef<
       layoutsRef.current,
       event,
       canvas,
-      viewportRef.current
+      viewportRef.current,
+      orientation,
     );
 
     if (node || toggle) {
@@ -420,7 +427,8 @@ export const TreeCanvas = forwardRef<
       layoutsRef.current,
       event,
       canvas,
-      viewportRef.current
+      viewportRef.current,
+      orientation
     );
 
     if (node) {
@@ -444,7 +452,8 @@ export const TreeCanvas = forwardRef<
       layoutsRef.current,
       event,
       canvas,
-      viewportRef.current
+      viewportRef.current,
+      orientation,
     );
     if (node || toggle) {
       canvas.style.cursor = "pointer";

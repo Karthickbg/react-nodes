@@ -4,7 +4,8 @@ export const getNodeAtPoint = (
   layouts: NodeLayout[],
   event: React.MouseEvent<HTMLCanvasElement>,
   canvas: HTMLCanvasElement,
-  viewport: Viewport
+  viewport: Viewport,
+  orientation: 'horizontal' | 'vertical'
 ): { node: NodeLayout | undefined, toggle: NodeLayout | undefined } => {
   const { x, y } = getWorldPoint(event, canvas, viewport);
 
@@ -15,11 +16,15 @@ export const getNodeAtPoint = (
       y >= layout.y &&
       y <= layout.y + layout.height
     ),
-    toggle: layouts.find(layout =>
-      x >= layout.x + layout.width &&
-      x <= layout.x + layout.width + 10 &&
-      y >= layout.y + (layout.height / 2) - 5 &&
-      y <= layout.y + (layout.height / 2) + 5
+    toggle: layouts.find(layout => orientation === 'horizontal'
+      ? x >= layout.x + layout.width &&
+        x <= layout.x + layout.width + 10 &&
+        y >= layout.y + (layout.height / 2) - 5 &&
+        y <= layout.y + (layout.height / 2) + 5
+      : x >= layout.x + (layout.width / 2) - 5 &&
+        x <= layout.x + (layout.width / 2) + 5 &&
+        y >= layout.y + layout.height &&
+        y <= layout.y + layout.height + 10
     )
   };
 }

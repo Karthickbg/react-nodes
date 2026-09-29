@@ -1,4 +1,4 @@
-import { TreeNode } from "./tree.types";
+import { CustomNodeRendererProps, TreeNode } from "./tree.types";
 
 export interface NodeLayout {
     node: TreeNode;
@@ -16,6 +16,7 @@ export interface Viewport {
 }
 
 export interface RenderTreeArgs {
+    canvas: HTMLCanvasElement
     ctx: CanvasRenderingContext2D;
 
     data: TreeNode[];
@@ -28,10 +29,12 @@ export interface RenderTreeArgs {
     nodeWidth: number;
     nodeHeight: number;
 
-    edgeGap: number;
+    levelGap: number;
     nodeGap: number;
     edgeType: "bezier" | "polyline";
     expandedNodes: Set<string>;
+    orientation: "horizontal" | "vertical";
+    nodeRenderers?: CustomNodeRendererProps[];
 }
 
 
@@ -39,8 +42,9 @@ export interface LayoutOptions {
     nodeWidth: number;
     nodeHeight: number;
 
-    edgeGap: number;
+    levelGap: number;
     nodeGap: number;
     expandedNodes: Set<string>;
     children: Map<string | undefined, TreeNode[]>;
+    orientation: "horizontal" | "vertical";
 }

@@ -4,7 +4,8 @@ export const drawNode = (
     ctx: CanvasRenderingContext2D,
     layout: NodeLayout,
     isExpanded: boolean,
-    hasChildren: boolean
+    hasChildren: boolean,
+    orientation: "horizontal" | "vertical"
 ) => {
     const {
         node,
@@ -57,15 +58,28 @@ export const drawNode = (
     );
 
     if (hasChildren) {
+        const iconX = orientation === "horizontal"
+            ? x + width + 5
+            : x + width / 2;
+        const iconY = orientation === "horizontal"
+            ? y + height / 2
+            : y + height + 5;
+
         ctx.beginPath();
-        ctx.arc(x + width + 5, y + height / 2, 5, 0, Math.PI * 2, false);
+        ctx.arc(iconX, iconY, 5, 0, Math.PI * 2, false);
         ctx.stroke();
         ctx.closePath();
         ctx.beginPath();
         ctx.strokeStyle = "#9c9b9b";
-        ctx.moveTo(x + width + (isExpanded ? 6 : 4), y + (height / 2) - 3);
-        ctx.lineTo(x + width + (isExpanded ? 3 : 7), y + height / 2);
-        ctx.lineTo(x + width + (isExpanded ? 6 : 4), y + (height / 2) + 3);
+        if (orientation === "horizontal") {
+            ctx.moveTo(iconX + (isExpanded ? 1 : -1), iconY - 3);
+            ctx.lineTo(iconX + (isExpanded ? -2 : 2), iconY);
+            ctx.lineTo(iconX + (isExpanded ? 1 : -1), iconY + 3);
+        } else {
+            ctx.moveTo(iconX - 3, iconY + (isExpanded ? 1 : -1));
+            ctx.lineTo(iconX, iconY + (isExpanded ? -2 : 2));
+            ctx.lineTo(iconX + 3, iconY + (isExpanded ? 1 : -1));
+        }
         ctx.stroke();
         ctx.closePath();
     }

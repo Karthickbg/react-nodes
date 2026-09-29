@@ -3,7 +3,8 @@ import { NodeLayout } from "../types/tree.internal.types";
 export const drawEdges = (
     ctx: CanvasRenderingContext2D,
     layouts: NodeLayout[],
-    edgeType: "bezier" | "polyline" | "straight"
+    edgeType: "bezier" | "polyline",
+    orientation: "horizontal" | "vertical",
 ) => {
     const layoutMap = new Map(
         layouts.map(layout => [
@@ -30,19 +31,20 @@ export const drawEdges = (
             continue;
         }
 
-        const startX =
-            parent.x + parent.width + 10;   // space for expanded/collapsed icon
+        const iconPadding = 10; // space for expanded/collapsed icon
 
-        const startY =
-            parent.y + parent.height / 2;
+        const startX = orientation === 'horizontal' ? parent.x + parent.width + iconPadding : parent.x + parent.width / 2;   
 
-        const endX = layout.x;
+        const startY = orientation === 'horizontal' ? parent.y + parent.height / 2 : parent.y + parent.height + iconPadding;
 
-        const endY =
-            layout.y + layout.height / 2;
+        const endX = orientation === 'horizontal' ? layout.x : layout.x + layout.width / 2;
+
+        const endY = orientation === 'horizontal' ? layout.y + layout.height / 2 : layout.y;
 
         const middleX =
             (startX + endX) / 2;
+
+        const middleY = (startY + endY) / 2;    
 
         ctx.save();
 
@@ -53,31 +55,59 @@ export const drawEdges = (
         );
 
         if (edgeType === "polyline") {
+            if(orientation === 'vertical'){
+                ctx.lineTo(
+                    startX,
+                    middleY,
+                );
 
-            ctx.lineTo(
-                middleX,
-                startY
-            );
+                ctx.lineTo(
+                    endX,
+                    middleY
+                );
 
-            ctx.lineTo(
-                middleX,
-                endY
-            );
+                ctx.lineTo(
+                    endX,
+                    endY
+                );
+            } else {
+                ctx.lineTo(
+                    middleX,
+                    startY
+                );
 
-            ctx.lineTo(
-                endX,
-                endY
-            );
+                ctx.lineTo(
+                    middleX,
+                    endY
+                );
+
+                ctx.lineTo(
+                    endX,
+                    endY
+                );
+            }
+           
         } else {
-
-            ctx.bezierCurveTo(
-                middleX,
-                startY,
-                middleX,
-                endY,
-                endX,
-                endY
-            );
+            if(orientation === 'horizontal') {
+                ctx.bezierCurveTo(
+                    middleX,
+                    startY,
+                    middleX,
+                    endY,
+                    endX,
+                    endY
+                );
+            } else {
+                ctx.bezierCurveTo(
+                    startX,
+                    middleY,
+                    endX,
+                    middleY,
+                    endX,
+                    endY
+                );
+            }
+            
         }
 
 

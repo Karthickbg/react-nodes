@@ -1,25 +1,31 @@
 import { TreeNode } from "../types";
 import { LayoutOptions, NodeLayout } from "../types/tree.internal.types";
 
-
 export const buildChildrenMap = (data: TreeNode[]) => {
-    const children =
-        new Map<string | undefined, TreeNode[]>();
+    const children = new Map<string | undefined, TreeNode[]>();
 
     for (const node of data) {
-        const list =
-            children.get(node.parentId) ?? [];
-
-        list.push(node);
-
-        children.set(
-            node.parentId,
-            list
-        );
+        const siblingNodes = children.get(node.parentId) ?? [];
+        siblingNodes.push(node);
+        children.set(node.parentId, siblingNodes);
     }
 
     return children;
-}
+};
+
+const createNodeLayout = (
+    node: TreeNode,
+    x: number,
+    y: number,
+    width: number,
+    height: number
+): NodeLayout => ({
+    node,
+    x,
+    y,
+    width,
+    height,
+});
 
 export const calculateTreeLayout = (
     options: LayoutOptions
@@ -27,10 +33,11 @@ export const calculateTreeLayout = (
     const {
         nodeWidth,
         nodeHeight,
-        edgeGap,
+        levelGap,
         nodeGap,
         expandedNodes,
         children,
+        orientation,
     } = options;
 
     const layouts: NodeLayout[] = [];
@@ -38,74 +45,81 @@ export const calculateTreeLayout = (
     const positionSubtree = (
         node: TreeNode,
         depth: number,
-        y: number
+        offset: number
     ): number => {
-        const childNodes =
-            children.get(node.id) ?? [];
+        const childNodes = children.get(node.id) ?? [];
+        const isExpanded = expandedNodes.has(node.id);
 
-        if (childNodes.length === 0 || !expandedNodes.has(node.id)) {
-            layouts.push({
-                node,
-                x:
-                    depth *
-                    (nodeWidth +
-                        edgeGap),
-                y,
-                width: nodeWidth,
-                height: nodeHeight,
-            });
+        if (childNodes.length === 0 || !isExpanded) {
+            if (orientation === "horizontal") {
+                layouts.push(
+                    createNodeLayout(
+                        node,
+                        depth * (nodeWidth + levelGap),
+                        offset,
+                        nodeWidth,
+                        nodeHeight
+                    )
+                );
 
-            return (
-                y +
-                nodeHeight +
-                nodeGap
+                return offset + nodeHeight + nodeGap;
+            }
+
+            layouts.push(
+                createNodeLayout(
+                    node,
+                    offset,
+                    depth * (nodeHeight + levelGap),
+                    nodeWidth,
+                    nodeHeight
+                )
             );
+
+            return offset + nodeWidth + nodeGap;
         }
 
-        const startY = y;
+        const startOffset = offset;
 
         for (const child of childNodes) {
-            y = positionSubtree(
-                child,
-                depth + 1,
-                y
-            );
+            offset = positionSubtree(child, depth + 1, offset);
         }
 
-        const endY =
-            y - nodeGap;
+        const endOffset = offset - nodeGap;
 
-        layouts.push({
-            node,
+        if (orientation === "horizontal") {
+            layouts.push(
+                createNodeLayout(
+                    node,
+                    depth * (nodeWidth + levelGap),
+                    (startOffset + endOffset) / 2 - nodeHeight / 2,
+                    nodeWidth,
+                    nodeHeight
+                )
+            );
 
-            x:
-                depth *
-                (nodeWidth +
-                    edgeGap),
+            return offset;
+        }
 
-            y:
-                (startY + endY) / 2 -
-                nodeHeight / 2,
+        layouts.push(
+            createNodeLayout(
+                node,
+                (startOffset + endOffset) / 2 - nodeWidth / 2,
+                depth * (nodeHeight + levelGap),
+                nodeWidth,
+                nodeHeight
+            )
+        );
 
-            width: nodeWidth,
-            height: nodeHeight,
-        });
-
-        return y;
+        return offset;
     };
 
-    const roots =
-        children.get(undefined) ?? [];
+    const roots = children.get(undefined) ?? [];
 
-    let y = 0;
+    let offset = 0;
 
     for (const root of roots) {
-        y = positionSubtree(
-            root,
-            0,
-            y
-        );
+        offset = positionSubtree(root, 0, offset);
     }
 
     return layouts;
-}
+};
