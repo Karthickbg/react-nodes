@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import { ReactNode } from 'react';
 
 export interface TreeNode {
   id: string;
@@ -7,7 +7,7 @@ export interface TreeNode {
   value: string;
   width?: number;
   height?: number;
-  lineType?: "solid" | "dashed";
+  lineType?: 'solid' | 'dashed';
   edgeColor?: string;
   type?: string;
 }
@@ -18,14 +18,14 @@ export interface ExpandCollapseRendererProps {
   draw: (
     args: { ctx: CanvasRenderingContext2D; rect: DOMRect },
     isExpanded: boolean,
-    orientation: "horizontal" | "vertical",
-    node: TreeNode
+    orientation: 'horizontal' | 'vertical',
+    node: TreeNode,
   ) => void;
 }
 
 export interface CustomNodeRendererProps {
   type: string;
-  draw: (args: { ctx: CanvasRenderingContext2D, rect: DOMRect }, node: TreeNode) => void;
+  draw: (args: { ctx: CanvasRenderingContext2D; rect: DOMRect }, node: TreeNode) => void;
   allowOverlay?: boolean;
   overlayRenderer?: (node: TreeNode) => ReactNode;
 }
@@ -39,7 +39,7 @@ export interface TreeCanvasProps {
 
   levelGap?: number;
   nodeGap?: number;
-  edgeType?: "bezier" | "polyline";
+  edgeType?: 'bezier' | 'polyline';
 
   minZoom?: number;
   maxZoom?: number;
@@ -49,7 +49,7 @@ export interface TreeCanvasProps {
   showExpandCollapse?: boolean;
   expandCollapseRenderer?: ExpandCollapseRendererProps;
 
-  orientation?: "horizontal" | "vertical";
+  orientation?: 'horizontal' | 'vertical';
 
   onNodeClick?: (node: TreeNode, event: React.MouseEvent<HTMLCanvasElement>) => void;
   onHoverNode?: (node: TreeNode | null, event: React.MouseEvent<HTMLCanvasElement>) => void;

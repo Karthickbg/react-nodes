@@ -1,6 +1,6 @@
 {
   "name": "react-nodes",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "A React component library",
   "type": "module",
   "main": "./dist/react-nodes.cjs",
@@ -21,7 +21,13 @@
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview",
     "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build"
+    "build-storybook": "storybook build",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
+  },
+  "prettier": "@spotify/prettier-config",
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx,json,css,md}": "prettier --write"
   },
   "peerDependencies": {
     "react": ">=18",
@@ -33,6 +39,7 @@
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
     "@vitejs/plugin-react": "^5.0.0",
+    "prettier": "^3.9.9",
     "react-tiny-popover": "^8.1.6",
     "storybook": "^10.5.10",
     "typescript": "^5.0.0",

@@ -1,17 +1,10 @@
-import {
-  useCallback,
-  useEffect,
-  useRef,
-} from "react";
+import { useCallback, useEffect, useRef } from 'react';
 
-import {
-  NodeLayout,
-  UseTreeRendererOptions,
-} from "../types/tree.internal.types";
+import { NodeLayout, UseTreeRendererOptions } from '../types/tree.internal.types';
 
-import { renderTree } from "../rendering/tree.renderer";
-import { buildChildrenMap, calculateTreeLayout } from "../utils/tree.layout";
-import { TreeNode } from "../types/tree.types";
+import { renderTree } from '../rendering/tree.renderer';
+import { buildChildrenMap, calculateTreeLayout } from '../utils/tree.layout';
+import { TreeNode } from '../types/tree.types';
 
 export function useTreeRenderer({
   canvasRef,
@@ -43,7 +36,7 @@ export function useTreeRenderer({
       return;
     }
 
-    const ctx = canvas.getContext("2d");
+    const ctx = canvas.getContext('2d');
 
     if (!ctx) {
       return;
@@ -61,7 +54,7 @@ export function useTreeRenderer({
       expandCollapseRenderer,
       nodeRenderers,
       layouts: layoutsRef.current,
-      childrenMap: childrenMapRef.current
+      childrenMap: childrenMapRef.current,
     });
 
     onRender?.(layoutsRef.current);
@@ -78,28 +71,19 @@ export function useTreeRenderer({
     onRender,
   ]);
 
-    const calculateLayout = useCallback(() => {
-  
-      childrenMapRef.current = buildChildrenMap(data)
-  
-      layoutsRef.current = calculateTreeLayout({
-        childrenMap: childrenMapRef.current,
-        nodeWidth,
-        nodeHeight,
-        levelGap,
-        nodeGap,
-        orientation,
-        expandedNodes: expandedNodesRef.current,
-      });
-  
-    }, [
-      data,
+  const calculateLayout = useCallback(() => {
+    childrenMapRef.current = buildChildrenMap(data);
+
+    layoutsRef.current = calculateTreeLayout({
+      childrenMap: childrenMapRef.current,
       nodeWidth,
       nodeHeight,
       levelGap,
       nodeGap,
-      orientation
-    ]);
+      orientation,
+      expandedNodes: expandedNodesRef.current,
+    });
+  }, [data, nodeWidth, nodeHeight, levelGap, nodeGap, orientation]);
 
   const drawRef = useRef(draw);
   drawRef.current = draw;
@@ -131,7 +115,7 @@ export function useTreeRenderer({
       return;
     }
 
-    const ctx = canvas.getContext("2d");
+    const ctx = canvas.getContext('2d');
 
     if (!ctx) {
       return;
@@ -145,10 +129,7 @@ export function useTreeRenderer({
       const width = Math.round(rect.width * dpr);
       const height = Math.round(rect.height * dpr);
 
-      if (
-        canvas.width !== width ||
-        canvas.height !== height
-      ) {
+      if (canvas.width !== width || canvas.height !== height) {
         canvas.width = width;
         canvas.height = height;
       }
@@ -163,23 +144,16 @@ export function useTreeRenderer({
        *
        * ctx coordinates still use 0 → 500.
        */
-      ctx.setTransform(
-        dpr,
-        0,
-        0,
-        dpr,
-        0,
-        0
-      );
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
       requestRender();
     };
 
     resize();
 
-    if (typeof ResizeObserver === "undefined") {
-      window.addEventListener("resize", resize);
-      return () => window.removeEventListener("resize", resize);
+    if (typeof ResizeObserver === 'undefined') {
+      window.addEventListener('resize', resize);
+      return () => window.removeEventListener('resize', resize);
     }
 
     const observer = new ResizeObserver(resize);

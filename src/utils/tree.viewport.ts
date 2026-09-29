@@ -1,8 +1,4 @@
-export const clampZoom = (
-  zoom: number,
-  minZoom: number,
-  maxZoom: number
-): number | null => {
+export const clampZoom = (zoom: number, minZoom: number, maxZoom: number): number | null => {
   if (
     !Number.isFinite(zoom) ||
     !Number.isFinite(minZoom) ||
