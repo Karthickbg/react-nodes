@@ -11,3 +11,6 @@ export const clampZoom = (zoom: number, minZoom: number, maxZoom: number): numbe
 
   return Math.min(Math.max(zoom, minZoom), maxZoom);
 };
+
+
+
