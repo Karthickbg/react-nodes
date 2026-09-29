@@ -7,7 +7,7 @@
 ## Installation
 
 ```bash
-npm install react-nodes
+npm install react-tree-canvas
 ```
 
 React 18 or newer and React DOM are peer dependencies and should already be installed in your application.
@@ -235,7 +235,10 @@ npm run build-storybook
 ```
 
 The package build writes ESM, CommonJS, and declaration outputs to `dist/`. Storybook examples are available at [react-nodes Storybook](https://karthickbg.github.io/react-tree-canvas/).
-You can play with this [code sandbox example](https://codesandbox.io/p/sandbox/3xwhcs)
+
+You can play with these code sandbox examples:
+[Basic example](https://codesandbox.io/p/sandbox/3xwhcs)
+[Custom node renderer example](https://codesandbox.io/p/sandbox/react-tree-canvas-custom-nodes-5t7vq6)
 
 ## License
 
