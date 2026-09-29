@@ -235,6 +235,7 @@ npm run build-storybook
 ```
 
 The package build writes ESM, CommonJS, and declaration outputs to `dist/`. Storybook examples are available at [react-nodes Storybook](https://karthickbg.github.io/react-tree-canvas/).
+You can play with this [code sandbox example](https://codesandbox.io/p/sandbox/3xwhcs)
 
 ## License
 
