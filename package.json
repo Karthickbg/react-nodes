@@ -1,6 +1,6 @@
 {
   "name": "react-tree-canvas",
-  "version": "1.0.2",
+  "version": "1.1.0",
   "description": "A React component library",
   "type": "module",
   "main": "./dist/react-tree-canvas.cjs",
