@@ -1,4 +1,10 @@
 import { RenderTreeArgs } from '../types/tree.internal.types';
+import {
+  getEdgeBounds,
+  getVisibleWorldRect,
+  isNodeVisible,
+  isRectVisible,
+} from '../utils/renderer.utils';
 import { drawEdges } from './tree.edges';
 import { drawNode } from './tree.node';
 
@@ -18,6 +24,8 @@ export function renderTree({
   childrenMap,
   nodeRenderers = [],
 }: RenderTreeArgs) {
+  const layoutMap = new Map(layouts.map((layout) => [layout.node.id, layout]));
+  const visibleRect = getVisibleWorldRect(width, height, viewport);
   // Clear canvas
   ctx.clearRect(0, 0, width, height);
 
@@ -28,21 +36,46 @@ export function renderTree({
 
   ctx.scale(viewport.zoom, viewport.zoom);
 
-  // Draw connections
-  drawEdges(ctx, layouts, edgeType, orientation, showExpandCollapse, expandCollapseRenderer);
-
-  // Draw nodes
   for (const layout of layouts) {
-    drawNode(
-      ctx,
-      layout,
-      expandedNodes.has(layout.node.id),
-      childrenMap.has(layout.node.id),
-      orientation,
-      showExpandCollapse,
-      expandCollapseRenderer,
-      nodeRenderers.find((renderer) => renderer.type === layout.node.type),
-    );
+    // Draw edges
+    const parentLayout = layoutMap.get(layout.node.parentId ?? '');
+
+    if (parentLayout) {
+      const edgeRect = getEdgeBounds({
+        parent: parentLayout,
+        layout,
+        edgeType,
+        orientation,
+        showExpandCollapse,
+        expandCollapseRenderer,
+      });
+
+      if (isRectVisible(edgeRect, visibleRect)) {
+        drawEdges(
+          ctx,
+          edgeType,
+          orientation,
+          showExpandCollapse,
+          layoutMap,
+          layout,
+          expandCollapseRenderer,
+        );
+      }
+    }
+
+    // Draw nodes
+    if (isNodeVisible(layout, visibleRect)) {
+      drawNode(
+        ctx,
+        layout,
+        expandedNodes.has(layout.node.id),
+        childrenMap.has(layout.node.id),
+        orientation,
+        showExpandCollapse,
+        expandCollapseRenderer,
+        nodeRenderers.find((renderer) => renderer.type === layout.node.type),
+      );
+    }
   }
 
   ctx.restore();
