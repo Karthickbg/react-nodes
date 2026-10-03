@@ -9,6 +9,7 @@ import { drawEdges } from './tree.edges';
 import { drawNode } from './tree.node';
 
 // TODO: add virtualization, double buffering / blit if needed
+const MIN_EDGE_LENGTH = 4;
 
 export function renderTree({
   ctx,
@@ -41,25 +42,39 @@ export function renderTree({
     const parentLayout = layoutMap.get(layout.node.parentId ?? '');
 
     if (parentLayout) {
-      const edgeRect = getEdgeBounds({
-        parent: parentLayout,
-        layout,
-        edgeType,
-        orientation,
-        showExpandCollapse,
-        expandCollapseRenderer,
-      });
+      const isHorizontal = orientation === 'horizontal';
+      const parentPrimaryEnd = isHorizontal
+        ? parentLayout.x + (parentLayout.node.width ?? parentLayout.width)
+        : parentLayout.y + (parentLayout.node.height ?? parentLayout.height);
+      const childPrimaryStart = isHorizontal ? layout.x : layout.y;
+      const iconPadding = showExpandCollapse
+        ? isHorizontal
+          ? (expandCollapseRenderer?.width ?? 10)
+          : (expandCollapseRenderer?.height ?? 10)
+        : 0;
+      const edgeLength = childPrimaryStart - parentPrimaryEnd - iconPadding;
 
-      if (isRectVisible(edgeRect, visibleRect)) {
-        drawEdges(
-          ctx,
+      if (edgeLength > MIN_EDGE_LENGTH) {
+        const edgeRect = getEdgeBounds({
+          parent: parentLayout,
+          layout,
           edgeType,
           orientation,
           showExpandCollapse,
-          layoutMap,
-          layout,
           expandCollapseRenderer,
-        );
+        });
+
+        if (isRectVisible(edgeRect, visibleRect)) {
+          drawEdges(
+            ctx,
+            edgeType,
+            orientation,
+            showExpandCollapse,
+            layoutMap,
+            layout,
+            expandCollapseRenderer,
+          );
+        }
       }
     }
 

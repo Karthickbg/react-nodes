@@ -6,6 +6,16 @@ import { renderTree } from '../rendering/tree.renderer';
 import { buildChildrenMap, calculateTreeLayout } from '../utils/tree.layout';
 import { TreeNode } from '../types/tree.types';
 
+const LAYOUT_ANIMATION_DURATION = 300;
+
+const interpolateLayout = (start: NodeLayout, end: NodeLayout, progress: number): NodeLayout => ({
+  node: end.node,
+  x: start.x + (end.x - start.x) * progress,
+  y: start.y + (end.y - start.y) * progress,
+  width: start.width + (end.width - start.width) * progress,
+  height: start.height + (end.height - start.height) * progress,
+});
+
 export function useTreeRenderer({
   canvasRef,
   viewportRef,
@@ -23,6 +33,7 @@ export function useTreeRenderer({
   onRender,
 }: UseTreeRendererOptions) {
   const frameRef = useRef<number | null>(null);
+  const animationFrameRef = useRef<number | null>(null);
   const childrenMapRef = useRef<Map<string | undefined, TreeNode[]>>(new Map());
   const layoutsRef = useRef<NodeLayout[]>([]);
 
@@ -74,7 +85,7 @@ export function useTreeRenderer({
   const calculateLayout = useCallback(() => {
     childrenMapRef.current = buildChildrenMap(data);
 
-    layoutsRef.current = calculateTreeLayout({
+    return calculateTreeLayout({
       childrenMap: childrenMapRef.current,
       nodeWidth,
       nodeHeight,
@@ -87,6 +98,114 @@ export function useTreeRenderer({
 
   const drawRef = useRef(draw);
   drawRef.current = draw;
+
+  const animateLayout = useCallback(
+    (targetLayouts: NodeLayout[]) => {
+      if (animationFrameRef.current !== null) {
+        cancelAnimationFrame(animationFrameRef.current);
+        animationFrameRef.current = null;
+      }
+
+      const previousLayouts = layoutsRef.current;
+      if (previousLayouts.length === 0) {
+        layoutsRef.current = targetLayouts;
+        return;
+      }
+
+      const targetById = new Map(targetLayouts.map((layout) => [layout.node.id, layout]));
+      const previousById = new Map(previousLayouts.map((layout) => [layout.node.id, layout]));
+      const nodesById = new Map(data.map((node) => [node.id, node]));
+      const findAncestorLayout = (
+        node: TreeNode,
+        layoutsById: Map<string, NodeLayout>,
+      ): NodeLayout | undefined => {
+        let parentId = node.parentId;
+
+        while (parentId !== undefined) {
+          const ancestorLayout = layoutsById.get(parentId);
+          if (ancestorLayout) {
+            return ancestorLayout;
+          }
+          parentId = nodesById.get(parentId)?.parentId;
+        }
+
+        return undefined;
+      };
+
+      const startById = new Map<string, NodeLayout>();
+      for (const targetLayout of targetLayouts) {
+        const previousLayout = previousById.get(targetLayout.node.id);
+
+        if (previousLayout) {
+          startById.set(targetLayout.node.id, previousLayout);
+          continue;
+        }
+
+        const ancestorLayout = findAncestorLayout(targetLayout.node, previousById);
+        startById.set(
+          targetLayout.node.id,
+          ancestorLayout
+            ? {
+                ...targetLayout,
+                x: ancestorLayout.x + (ancestorLayout.width - targetLayout.width) / 2,
+                y: ancestorLayout.y + (ancestorLayout.height - targetLayout.height) / 2,
+                width: 0,
+                height: 0,
+              }
+            : targetLayout,
+        );
+      }
+
+      const exitingLayouts = previousLayouts
+        .filter((layout) => !targetById.has(layout.node.id) && nodesById.has(layout.node.id))
+        .map((layout) => {
+          const ancestorLayout =
+            findAncestorLayout(layout.node, targetById) ??
+            findAncestorLayout(layout.node, previousById);
+          const endLayout = {
+            ...layout,
+            x: ancestorLayout
+              ? ancestorLayout.x + (ancestorLayout.width - layout.width) / 2
+              : layout.x + layout.width / 2,
+            y: ancestorLayout
+              ? ancestorLayout.y + (ancestorLayout.height - layout.height) / 2
+              : layout.y + layout.height / 2,
+            width: 0,
+            height: 0,
+          };
+
+          return { start: layout, end: endLayout };
+        });
+      const enteringAndStableLayouts = targetLayouts.map((layout) => ({
+        start: startById.get(layout.node.id)!,
+        end: layout,
+      }));
+      const transitions = [...enteringAndStableLayouts, ...exitingLayouts];
+      const startTime = performance.now();
+
+      const animate = (now: number) => {
+        const elapsed = now - startTime;
+        const linearProgress = Math.min(elapsed / LAYOUT_ANIMATION_DURATION, 1);
+        const progress =
+          linearProgress < 0.5 ? 4 * linearProgress ** 3 : 1 - (-2 * linearProgress + 2) ** 3 / 2;
+
+        layoutsRef.current =
+          linearProgress === 1
+            ? targetLayouts
+            : transitions.map(({ start, end }) => interpolateLayout(start, end, progress));
+        drawRef.current();
+
+        if (linearProgress < 1) {
+          animationFrameRef.current = requestAnimationFrame(animate);
+        } else {
+          animationFrameRef.current = null;
+        }
+      };
+
+      animationFrameRef.current = requestAnimationFrame(animate);
+    },
+    [data, layoutsRef],
+  );
 
   const scheduleDraw = useCallback(() => {
     if (frameRef.current !== null) {
@@ -101,9 +220,12 @@ export function useTreeRenderer({
   const requestRender = scheduleDraw;
 
   const requestLayoutRender = useCallback(() => {
-    calculateLayout();
-    scheduleDraw();
-  }, [calculateLayout, scheduleDraw]);
+    const targetLayouts = calculateLayout();
+    animateLayout(targetLayouts);
+    if (animationFrameRef.current === null) {
+      scheduleDraw();
+    }
+  }, [animateLayout, calculateLayout, layoutsRef, scheduleDraw]);
 
   /**
    * Resize canvas backing store for device pixel ratio.
@@ -180,6 +302,10 @@ export function useTreeRenderer({
       if (frameRef.current !== null) {
         cancelAnimationFrame(frameRef.current);
         frameRef.current = null;
+      }
+      if (animationFrameRef.current !== null) {
+        cancelAnimationFrame(animationFrameRef.current);
+        animationFrameRef.current = null;
       }
     };
   }, []);

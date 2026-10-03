@@ -228,6 +228,30 @@ export const TreeCanvas = forwardRef<TreeCanvasHandle, TreeCanvasProps>((props, 
     requestRender,
   });
 
+  const hasCenteredInitialNodeRef = useRef(false);
+
+  useEffect(() => {
+    hasCenteredInitialNodeRef.current = false;
+  }, [data]);
+
+  useEffect(() => {
+    if (!data.length) return;
+
+    const rootNode = data.find((node) => !node.parentId) ?? data[0];
+    if (!rootNode || hasCenteredInitialNodeRef.current) return;
+
+    const frameId = requestAnimationFrame(() => {
+      if (!layoutsRef.current.some((layout) => layout.node.id === rootNode.id)) {
+        return;
+      }
+
+      hasCenteredInitialNodeRef.current = true;
+      centerNode(rootNode.id);
+    });
+
+    return () => cancelAnimationFrame(frameId);
+  }, [data, centerNode, layoutsRef]);
+
   useImperativeHandle(
     ref,
     () => ({
