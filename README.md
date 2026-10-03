@@ -198,7 +198,6 @@ export function TreeWithControls() {
 | `toggle(nodeId)`     | `string`                        | Toggle a node's expanded state.                                                |
 | `expandAll()`        | —                               | Expand every node in the current data.                                         |
 | `collapseAll()`      | —                               | Collapse all nodes.                                                            |
-| `refresh()`          | —                               | Recalculate and redraw the tree.                                               |
 
 Use `treeRef` to as follows:
 
@@ -210,7 +209,6 @@ treeRef.current?.expand('node');
 treeRef.current?.collapse('node');
 treeRef.current?.expandAll();
 treeRef.current?.collapseAll();
-treeRef.current?.refresh();
 ```
 
 ## Layout and Interaction
