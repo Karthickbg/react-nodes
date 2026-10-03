@@ -2,7 +2,7 @@
 
 `react-tree-canvas` is a React and TypeScript library for displaying hierarchical data as an interactive canvas tree. It provides automatic tree layout, horizontal and vertical orientations, expandable branches, node callbacks, pan and zoom controls, and an imperative API for controlling the view.
 
-![React Nodes service tree mockup](react-nodes-mockup.svg)
+![React Nodes service tree mockup](static/Recording%202026-10-03%20130041.gif)
 
 ## Installation
 
