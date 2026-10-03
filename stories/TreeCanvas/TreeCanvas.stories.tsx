@@ -278,9 +278,6 @@ function ImperativeRefExample() {
           <button style={buttonStyle} onClick={() => treeRef.current?.collapseAll()}>
             Collapse all
           </button>
-          <button style={buttonStyle} onClick={() => treeRef.current?.refresh()}>
-            Refresh
-          </button>
         </div>
       </div>
       <div style={{ flex: 1, minHeight: 0, border: '1px solid #d5dce3', background: '#ffffff' }}>

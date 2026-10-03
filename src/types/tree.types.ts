@@ -39,6 +39,7 @@ export interface TreeCanvasProps {
 
   levelGap?: number;
   nodeGap?: number;
+  animationDuration?: number;
   edgeType?: 'bezier' | 'polyline';
 
   minZoom?: number;
@@ -74,6 +75,4 @@ export interface TreeCanvasHandle {
 
   expandAll(): void;
   collapseAll(): void;
-
-  refresh(): void;
 }

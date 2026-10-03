@@ -1,11 +1,12 @@
 import { NodeLayout, Viewport } from '../types/tree.internal.types';
 import { ExpandCollapseRendererProps } from '../types/tree.types';
+import { DEFAULT_EXPAND_COLLAPSE_SIZE, DEFAULT_VIEWPORT_OVERSCAN } from '../constants';
 
 export function getVisibleWorldRect(
   width: number,
   height: number,
   viewport: Viewport,
-  overscan = 200,
+  overscan = DEFAULT_VIEWPORT_OVERSCAN,
 ) {
   const x = -viewport.x / viewport.zoom;
   const y = -viewport.y / viewport.zoom;
@@ -61,8 +62,8 @@ export const getEdgeBounds = ({
   const childHeight = layout.node.height ?? layout.height;
   const iconPadding = showExpandCollapse
     ? isHorizontal
-      ? (expandCollapseRenderer?.width ?? 10)
-      : (expandCollapseRenderer?.height ?? 10)
+      ? (expandCollapseRenderer?.width ?? DEFAULT_EXPAND_COLLAPSE_SIZE)
+      : (expandCollapseRenderer?.height ?? DEFAULT_EXPAND_COLLAPSE_SIZE)
     : 0;
 
   const start = isHorizontal

@@ -7,33 +7,55 @@ import { useTreeCanvasPointerInteraction } from '../../hooks/useTreeCanvasPointe
 import { useTreeRenderer } from '../../hooks/useTreeRenderer';
 import { useTreeCanvasActions } from '../../hooks/useTreeCanvasActions';
 import { clampZoom } from '../../utils/tree.viewport';
+import {
+  DEFAULT_EDGE_TYPE,
+  DEFAULT_EXPAND_COLLAPSE_SIZE,
+  DEFAULT_INITIAL_ZOOM,
+  DEFAULT_LAYOUT_ANIMATION_DURATION_MS,
+  DEFAULT_LEVEL_GAP,
+  DEFAULT_MAX_ZOOM,
+  DEFAULT_MIN_ZOOM,
+  DEFAULT_NODE_GAP,
+  DEFAULT_NODE_HEIGHT,
+  DEFAULT_NODE_WIDTH,
+  DEFAULT_ORIENTATION,
+  DEFAULT_PAN_ENABLED,
+  DEFAULT_SHOW_EXPAND_COLLAPSE,
+  DEFAULT_TREE_CANVAS_HEIGHT,
+  DEFAULT_TREE_CANVAS_WIDTH,
+  DEFAULT_ZOOM_ENABLED,
+  DEFAULT_ZOOM_STEP,
+} from '../../constants';
 
 export const TreeCanvas = forwardRef<TreeCanvasHandle, TreeCanvasProps>((props, ref) => {
   const {
-    width = '100%',
-    height = '100%',
+    width = DEFAULT_TREE_CANVAS_WIDTH,
+    height = DEFAULT_TREE_CANVAS_HEIGHT,
     data,
-    nodeWidth = 150,
-    nodeHeight = 50,
-    levelGap = 150,
-    nodeGap = 30,
-    edgeType = 'bezier',
-    minZoom = 0.2,
-    maxZoom = 3,
-    initialZoom = 1,
-    zoomEnabled = true,
-    panEnabled = true,
-    showExpandCollapse = true,
+    nodeWidth = DEFAULT_NODE_WIDTH,
+    nodeHeight = DEFAULT_NODE_HEIGHT,
+    levelGap = DEFAULT_LEVEL_GAP,
+    nodeGap = DEFAULT_NODE_GAP,
+    animationDuration = DEFAULT_LAYOUT_ANIMATION_DURATION_MS,
+    edgeType = DEFAULT_EDGE_TYPE,
+    minZoom = DEFAULT_MIN_ZOOM,
+    maxZoom = DEFAULT_MAX_ZOOM,
+    initialZoom = DEFAULT_INITIAL_ZOOM,
+    zoomEnabled = DEFAULT_ZOOM_ENABLED,
+    panEnabled = DEFAULT_PAN_ENABLED,
+    showExpandCollapse = DEFAULT_SHOW_EXPAND_COLLAPSE,
     expandCollapseRenderer,
     nodeRenderers,
-    orientation = 'horizontal',
+    orientation = DEFAULT_ORIENTATION,
     onNodeClick,
     onHoverNode,
     onDoubleClickNode,
   } = props;
 
   const initialViewportZoom =
-    clampZoom(initialZoom, minZoom, maxZoom) ?? clampZoom(1, minZoom, maxZoom) ?? 1;
+    clampZoom(initialZoom, minZoom, maxZoom) ??
+    clampZoom(DEFAULT_INITIAL_ZOOM, minZoom, maxZoom) ??
+    DEFAULT_INITIAL_ZOOM;
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const overlayLayerRef = useRef<HTMLDivElement>(null);
   const overlayNodeRef = useRef<HTMLDivElement>(null);
@@ -56,8 +78,8 @@ export const TreeCanvas = forwardRef<TreeCanvasHandle, TreeCanvasProps>((props, 
     (node: TreeNode) => nodeRenderers?.some((renderer) => renderer.type === node.type) ?? false,
     [nodeRenderers],
   );
-  const expandCollapseWidth = expandCollapseRenderer?.width ?? 10;
-  const expandCollapseHeight = expandCollapseRenderer?.height ?? 10;
+  const expandCollapseWidth = expandCollapseRenderer?.width ?? DEFAULT_EXPAND_COLLAPSE_SIZE;
+  const expandCollapseHeight = expandCollapseRenderer?.height ?? DEFAULT_EXPAND_COLLAPSE_SIZE;
   const handleHoverNode = useCallback(
     (node: TreeNode | null, event: React.MouseEvent<HTMLCanvasElement>) => {
       hoveredNodeIdRef.current = node?.id ?? null;
@@ -106,6 +128,7 @@ export const TreeCanvas = forwardRef<TreeCanvasHandle, TreeCanvasProps>((props, 
         )
       : levelGap,
     nodeGap,
+    animationDuration,
     edgeType,
     orientation,
     showExpandCollapse,
@@ -259,11 +282,11 @@ export const TreeCanvas = forwardRef<TreeCanvasHandle, TreeCanvasProps>((props, 
         setZoom(zoom);
       },
 
-      zoomIn(step = 0.1) {
+      zoomIn(step = DEFAULT_ZOOM_STEP) {
         setZoom(viewportRef.current.zoom + step);
       },
 
-      zoomOut(step = 0.1) {
+      zoomOut(step = DEFAULT_ZOOM_STEP) {
         setZoom(viewportRef.current.zoom - step);
       },
 
@@ -279,9 +302,6 @@ export const TreeCanvas = forwardRef<TreeCanvasHandle, TreeCanvasProps>((props, 
         centerNode(nodeId);
       },
 
-      refresh() {
-        requestRender();
-      },
       expand(nodeId: string) {
         setNodeExpanded(nodeId, true);
       },

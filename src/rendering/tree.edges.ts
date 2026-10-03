@@ -1,5 +1,11 @@
 import { NodeLayout } from '../types/tree.internal.types';
 import { ExpandCollapseRendererProps } from '../types/tree.types';
+import {
+  DEFAULT_EDGE_COLOR,
+  DEFAULT_EXPAND_COLLAPSE_SIZE,
+  DASHED_EDGE_LENGTH,
+  EDGE_LINE_WIDTH,
+} from '../constants';
 
 export const drawEdges = (
   ctx: CanvasRenderingContext2D,
@@ -14,7 +20,7 @@ export const drawEdges = (
   const toCanvasPoint = (primary: number, secondary: number) =>
     isHorizontal ? { x: primary, y: secondary } : { x: secondary, y: primary };
 
-  ctx.lineWidth = 2;
+  ctx.lineWidth = EDGE_LINE_WIDTH;
 
   const parentId = layout.node.parentId;
 
@@ -34,8 +40,8 @@ export const drawEdges = (
   const childHeight = layout.node.height ?? layout.height;
   const iconPadding = showExpandCollapse
     ? isHorizontal
-      ? (expandCollapseRenderer?.width ?? 10)
-      : (expandCollapseRenderer?.height ?? 10)
+      ? (expandCollapseRenderer?.width ?? DEFAULT_EXPAND_COLLAPSE_SIZE)
+      : (expandCollapseRenderer?.height ?? DEFAULT_EXPAND_COLLAPSE_SIZE)
     : 0;
   const start = toCanvasPoint(
     isHorizontal ? parent.x + parentWidth + iconPadding : parent.y + parentHeight + iconPadding,
@@ -50,7 +56,7 @@ export const drawEdges = (
   const endSecondary = isHorizontal ? end.y : end.x;
 
   ctx.save();
-  ctx.strokeStyle = layout.node.edgeColor ?? '#bbbbbb';
+  ctx.strokeStyle = layout.node.edgeColor ?? DEFAULT_EDGE_COLOR;
 
   ctx.beginPath();
   ctx.moveTo(start.x, start.y);
@@ -74,7 +80,7 @@ export const drawEdges = (
     );
   }
 
-  ctx.setLineDash([layout.node.lineType === 'dashed' ? 5 : 0]);
+  ctx.setLineDash([layout.node.lineType === 'dashed' ? DASHED_EDGE_LENGTH : 0]);
 
   ctx.stroke();
   ctx.restore();

@@ -1,4 +1,5 @@
 import { NodeLayout, Viewport } from '../types/tree.internal.types';
+import { DEFAULT_EXPAND_COLLAPSE_SIZE } from '../constants';
 
 export const getNodeAtPoint = (
   layouts: NodeLayout[],
@@ -7,8 +8,8 @@ export const getNodeAtPoint = (
   viewport: Viewport,
   orientation: 'horizontal' | 'vertical',
   showExpandCollapse = true,
-  expandCollapseWidth = 10,
-  expandCollapseHeight = 10,
+  expandCollapseWidth = DEFAULT_EXPAND_COLLAPSE_SIZE,
+  expandCollapseHeight = DEFAULT_EXPAND_COLLAPSE_SIZE,
 ): { node: NodeLayout | undefined; toggle: NodeLayout | undefined } => {
   const { x, y } = getWorldPoint(event, canvas, viewport);
 

@@ -6,8 +6,6 @@ import { renderTree } from '../rendering/tree.renderer';
 import { buildChildrenMap, calculateTreeLayout } from '../utils/tree.layout';
 import { TreeNode } from '../types/tree.types';
 
-const LAYOUT_ANIMATION_DURATION = 300;
-
 const interpolateLayout = (start: NodeLayout, end: NodeLayout, progress: number): NodeLayout => ({
   node: end.node,
   x: start.x + (end.x - start.x) * progress,
@@ -25,6 +23,7 @@ export function useTreeRenderer({
   nodeHeight,
   levelGap,
   nodeGap,
+  animationDuration,
   edgeType,
   orientation,
   showExpandCollapse,
@@ -107,7 +106,11 @@ export function useTreeRenderer({
       }
 
       const previousLayouts = layoutsRef.current;
-      if (previousLayouts.length === 0) {
+      if (
+        previousLayouts.length === 0 ||
+        !Number.isFinite(animationDuration) ||
+        animationDuration <= 0
+      ) {
         layoutsRef.current = targetLayouts;
         return;
       }
@@ -185,7 +188,7 @@ export function useTreeRenderer({
 
       const animate = (now: number) => {
         const elapsed = now - startTime;
-        const linearProgress = Math.min(elapsed / LAYOUT_ANIMATION_DURATION, 1);
+        const linearProgress = Math.min(elapsed / animationDuration, 1);
         const progress =
           linearProgress < 0.5 ? 4 * linearProgress ** 3 : 1 - (-2 * linearProgress + 2) ** 3 / 2;
 
@@ -204,7 +207,7 @@ export function useTreeRenderer({
 
       animationFrameRef.current = requestAnimationFrame(animate);
     },
-    [data, layoutsRef],
+    [animationDuration, data, layoutsRef],
   );
 
   const scheduleDraw = useCallback(() => {
@@ -225,7 +228,7 @@ export function useTreeRenderer({
     if (animationFrameRef.current === null) {
       scheduleDraw();
     }
-  }, [animateLayout, calculateLayout, layoutsRef, scheduleDraw]);
+  }, [animateLayout, calculateLayout, scheduleDraw]);
 
   /**
    * Resize canvas backing store for device pixel ratio.

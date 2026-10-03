@@ -1,5 +1,22 @@
 import { NodeLayout } from '../types/tree.internal.types';
 import { CustomNodeRendererProps, ExpandCollapseRendererProps } from '../types/tree.types';
+import {
+  DEFAULT_EXPAND_COLLAPSE_SIZE,
+  EXPAND_COLLAPSE_CHEVRON_INSET,
+  EXPAND_COLLAPSE_CHEVRON_SIZE,
+  EXPAND_COLLAPSE_CHEVRON_TIP_INSET,
+  EXPAND_COLLAPSE_ICON_COLOR,
+  NODE_BACKGROUND_COLOR,
+  NODE_BORDER_COLOR,
+  NODE_BORDER_LINE_WIDTH,
+  NODE_TEXT_HORIZONTAL_PADDING,
+  NODE_TITLE_BASELINE_OFFSET,
+  NODE_TITLE_COLOR,
+  NODE_TITLE_FONT,
+  NODE_VALUE_BASELINE_OFFSET,
+  NODE_VALUE_COLOR,
+  NODE_VALUE_FONT,
+} from '../constants';
 
 export const drawNode = (
   ctx: CanvasRenderingContext2D,
@@ -25,28 +42,28 @@ export const drawNode = (
     }
   } else {
     // Card background
-    ctx.fillStyle = '#ffffff';
+    ctx.fillStyle = NODE_BACKGROUND_COLOR;
     ctx.fillRect(x, y, width, height);
 
     // Card border
-    ctx.strokeStyle = '#dddddd';
-    ctx.lineWidth = 1;
+    ctx.strokeStyle = NODE_BORDER_COLOR;
+    ctx.lineWidth = NODE_BORDER_LINE_WIDTH;
     ctx.strokeRect(x, y, width, height);
 
     // Title
-    ctx.fillStyle = '#666666';
-    ctx.font = '12px sans-serif';
-    ctx.fillText(node.title, x + 10, y + 20);
+    ctx.fillStyle = NODE_TITLE_COLOR;
+    ctx.font = NODE_TITLE_FONT;
+    ctx.fillText(node.title, x + NODE_TEXT_HORIZONTAL_PADDING, y + NODE_TITLE_BASELINE_OFFSET);
 
     // Value
-    ctx.fillStyle = '#111111';
-    ctx.font = 'bold 18px sans-serif';
-    ctx.fillText(node.value, x + 10, y + 40);
+    ctx.fillStyle = NODE_VALUE_COLOR;
+    ctx.font = NODE_VALUE_FONT;
+    ctx.fillText(node.value, x + NODE_TEXT_HORIZONTAL_PADDING, y + NODE_VALUE_BASELINE_OFFSET);
   }
 
   if (hasChildren && showExpandCollapse) {
-    const iconWidth = expandCollapseRenderer?.width ?? 10;
-    const iconHeight = expandCollapseRenderer?.height ?? 10;
+    const iconWidth = expandCollapseRenderer?.width ?? DEFAULT_EXPAND_COLLAPSE_SIZE;
+    const iconHeight = expandCollapseRenderer?.height ?? DEFAULT_EXPAND_COLLAPSE_SIZE;
     const iconRect =
       orientation === 'horizontal'
         ? new DOMRect(x + width, y + (height - iconHeight) / 2, iconWidth, iconHeight)
@@ -67,15 +84,35 @@ export const drawNode = (
       ctx.stroke();
       ctx.closePath();
       ctx.beginPath();
-      ctx.strokeStyle = '#9c9b9b';
+      ctx.strokeStyle = EXPAND_COLLAPSE_ICON_COLOR;
       if (orientation === 'horizontal') {
-        ctx.moveTo(iconX + (isExpanded ? 1 : -1), iconY - 3);
-        ctx.lineTo(iconX + (isExpanded ? -2 : 2), iconY);
-        ctx.lineTo(iconX + (isExpanded ? 1 : -1), iconY + 3);
+        ctx.moveTo(
+          iconX + (isExpanded ? EXPAND_COLLAPSE_CHEVRON_INSET : -EXPAND_COLLAPSE_CHEVRON_INSET),
+          iconY - EXPAND_COLLAPSE_CHEVRON_SIZE,
+        );
+        ctx.lineTo(
+          iconX +
+            (isExpanded ? -EXPAND_COLLAPSE_CHEVRON_TIP_INSET : EXPAND_COLLAPSE_CHEVRON_TIP_INSET),
+          iconY,
+        );
+        ctx.lineTo(
+          iconX + (isExpanded ? EXPAND_COLLAPSE_CHEVRON_INSET : -EXPAND_COLLAPSE_CHEVRON_INSET),
+          iconY + EXPAND_COLLAPSE_CHEVRON_SIZE,
+        );
       } else {
-        ctx.moveTo(iconX - 3, iconY + (isExpanded ? 1 : -1));
-        ctx.lineTo(iconX, iconY + (isExpanded ? -2 : 2));
-        ctx.lineTo(iconX + 3, iconY + (isExpanded ? 1 : -1));
+        ctx.moveTo(
+          iconX - EXPAND_COLLAPSE_CHEVRON_SIZE,
+          iconY + (isExpanded ? EXPAND_COLLAPSE_CHEVRON_INSET : -EXPAND_COLLAPSE_CHEVRON_INSET),
+        );
+        ctx.lineTo(
+          iconX,
+          iconY +
+            (isExpanded ? -EXPAND_COLLAPSE_CHEVRON_TIP_INSET : EXPAND_COLLAPSE_CHEVRON_TIP_INSET),
+        );
+        ctx.lineTo(
+          iconX + EXPAND_COLLAPSE_CHEVRON_SIZE,
+          iconY + (isExpanded ? EXPAND_COLLAPSE_CHEVRON_INSET : -EXPAND_COLLAPSE_CHEVRON_INSET),
+        );
       }
       ctx.stroke();
       ctx.closePath();

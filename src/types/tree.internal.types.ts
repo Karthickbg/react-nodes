@@ -95,6 +95,7 @@ export interface UseTreeRendererOptions {
   nodeHeight: number;
   levelGap: number;
   nodeGap: number;
+  animationDuration: number;
 
   edgeType: 'bezier' | 'polyline';
   orientation: 'horizontal' | 'vertical';

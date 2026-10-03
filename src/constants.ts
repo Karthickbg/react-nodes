@@ -1,0 +1,43 @@
+export const DEFAULT_TREE_CANVAS_WIDTH = '100%';
+export const DEFAULT_TREE_CANVAS_HEIGHT = '100%';
+export const DEFAULT_NODE_WIDTH = 150;
+export const DEFAULT_NODE_HEIGHT = 50;
+export const DEFAULT_LEVEL_GAP = 150;
+export const DEFAULT_NODE_GAP = 30;
+export const DEFAULT_EDGE_TYPE = 'bezier' as const;
+export const DEFAULT_MIN_ZOOM = 0.2;
+export const DEFAULT_MAX_ZOOM = 3;
+export const DEFAULT_INITIAL_ZOOM = 1;
+export const DEFAULT_ZOOM_ENABLED = true;
+export const DEFAULT_PAN_ENABLED = true;
+export const DEFAULT_SHOW_EXPAND_COLLAPSE = true;
+export const DEFAULT_ORIENTATION = 'horizontal' as const;
+export const DEFAULT_ZOOM_STEP = 0.1;
+export const WHEEL_ZOOM_IN_FACTOR = 1.1;
+export const WHEEL_ZOOM_OUT_FACTOR = 0.9;
+
+export const DEFAULT_EXPAND_COLLAPSE_SIZE = 10;
+export const DEFAULT_VIEWPORT_OVERSCAN = 200;
+export const DEFAULT_LAYOUT_ANIMATION_DURATION_MS = 300;
+export const MIN_EDGE_LENGTH = 4;
+export const NODE_CLICK_DELAY_MS = 250;
+export const NODE_HOVER_DELAY_MS = 250;
+
+export const EDGE_LINE_WIDTH = 2;
+export const DEFAULT_EDGE_COLOR = '#bbbbbb';
+export const DASHED_EDGE_LENGTH = 5;
+
+export const NODE_BACKGROUND_COLOR = '#ffffff';
+export const NODE_BORDER_COLOR = '#dddddd';
+export const NODE_BORDER_LINE_WIDTH = 1;
+export const NODE_TITLE_COLOR = '#666666';
+export const NODE_TITLE_FONT = '12px sans-serif';
+export const NODE_VALUE_COLOR = '#111111';
+export const NODE_VALUE_FONT = 'bold 18px sans-serif';
+export const EXPAND_COLLAPSE_ICON_COLOR = '#9c9b9b';
+export const NODE_TEXT_HORIZONTAL_PADDING = 10;
+export const NODE_TITLE_BASELINE_OFFSET = 20;
+export const NODE_VALUE_BASELINE_OFFSET = 40;
+export const EXPAND_COLLAPSE_CHEVRON_SIZE = 3;
+export const EXPAND_COLLAPSE_CHEVRON_INSET = 1;
+export const EXPAND_COLLAPSE_CHEVRON_TIP_INSET = 2;

@@ -7,9 +7,9 @@ import {
 } from '../utils/renderer.utils';
 import { drawEdges } from './tree.edges';
 import { drawNode } from './tree.node';
+import { DEFAULT_EXPAND_COLLAPSE_SIZE, MIN_EDGE_LENGTH } from '../constants';
 
 // TODO: add virtualization, double buffering / blit if needed
-const MIN_EDGE_LENGTH = 4;
 
 export function renderTree({
   ctx,
@@ -49,8 +49,8 @@ export function renderTree({
       const childPrimaryStart = isHorizontal ? layout.x : layout.y;
       const iconPadding = showExpandCollapse
         ? isHorizontal
-          ? (expandCollapseRenderer?.width ?? 10)
-          : (expandCollapseRenderer?.height ?? 10)
+          ? (expandCollapseRenderer?.width ?? DEFAULT_EXPAND_COLLAPSE_SIZE)
+          : (expandCollapseRenderer?.height ?? DEFAULT_EXPAND_COLLAPSE_SIZE)
         : 0;
       const edgeLength = childPrimaryStart - parentPrimaryEnd - iconPadding;
 

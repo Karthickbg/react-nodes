@@ -6,6 +6,12 @@ import {
   getWorldPoint,
 } from '../utils/tree.canvas-interaction';
 import { clampZoom } from '../utils/tree.viewport';
+import {
+  NODE_CLICK_DELAY_MS,
+  NODE_HOVER_DELAY_MS,
+  WHEEL_ZOOM_IN_FACTOR,
+  WHEEL_ZOOM_OUT_FACTOR,
+} from '../constants';
 
 export const useTreeCanvasPointerInteraction = ({
   canvasRef,
@@ -179,7 +185,7 @@ export const useTreeCanvasPointerInteraction = ({
         if (toggle) toggleNode(toggle.node.id);
         if (node) onNodeClick?.(node.node, event);
         clickTimeout.current = null; // Reset after execution
-      }, 250);
+      }, NODE_CLICK_DELAY_MS);
     }
   };
 
@@ -271,7 +277,7 @@ export const useTreeCanvasPointerInteraction = ({
           onHoverNode?.(null, event);
         }
       }
-    }, 250); // Debounce for 250ms
+    }, NODE_HOVER_DELAY_MS);
   };
 
   useEffect(() => {
@@ -291,7 +297,7 @@ export const useTreeCanvasPointerInteraction = ({
         currentViewport,
       );
 
-      const zoomFactor = event.deltaY > 0 ? 0.9 : 1.1;
+      const zoomFactor = event.deltaY > 0 ? WHEEL_ZOOM_OUT_FACTOR : WHEEL_ZOOM_IN_FACTOR;
 
       const zoom = clampZoom(currentViewport.zoom * zoomFactor, minZoom, maxZoom);
       if (zoom === null) return;
